@@ -207,6 +207,22 @@ var Themes = map[string]Theme{
 		},
 		Bright: RGBColor{200, 240, 180},
 	},
+	"wildberries": {
+		Name: "wildberries",
+		Palette: []RGBColor{
+			{255,13,130},
+			{144,124,255},
+			{72,200,160},
+			{255,160,120},
+		},
+		Dim: []RGBColor{
+			{90,5,45},
+			{60,50,120},
+			{30,100,90},
+			{120,70,50},
+		},
+		Bright: RGBColor{0,253,181},
+     },
 	"mono": {
 		Name: "mono",
 		Palette: []RGBColor{
