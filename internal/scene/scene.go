@@ -255,9 +255,3 @@ func clamp64(v, lo, hi float64) float64 {
 	return v
 }
 
-func minInt(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}

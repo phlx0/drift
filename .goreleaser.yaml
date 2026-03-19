@@ -41,13 +41,5 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
-changelog:
-  sort: asc
-  use: github
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^chore:"
-      - Merge pull request
-      - Merge branch
+# Release notes are extracted from CHANGELOG.md by the release workflow.
+# See .github/workflows/release.yml

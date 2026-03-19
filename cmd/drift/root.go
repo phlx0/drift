@@ -199,7 +199,10 @@ var configCmd = &cobra.Command{
 
 Use --init to write a default config file (will not overwrite an existing one).`,
 	RunE: func(cmd *cobra.Command, _ []string) error {
-		initFlag, _ := cmd.Flags().GetBool("init")
+		initFlag, err := cmd.Flags().GetBool("init")
+		if err != nil {
+			return err
+		}
 		if initFlag {
 			return initConfig()
 		}
@@ -212,14 +215,11 @@ func init() {
 }
 
 func showConfig() error {
-	path, err := config.Path()
-	if err != nil {
-		return err
-	}
 	cfg, err := config.Load()
 	if err != nil {
 		return err
 	}
+	path, _ := config.Path() //nolint:errcheck
 	fmt.Printf("Config file: %s\n\n", path)
 	fmt.Printf("theme:         %s\n", cfg.Engine.Theme)
 	fmt.Printf("fps:           %d\n", cfg.Engine.FPS)
@@ -232,13 +232,13 @@ func showConfig() error {
 func initConfig() error {
 	if err := config.WriteDefault(); err != nil {
 		if os.IsExist(err) {
-			path, _ := config.Path()
+			path, _ := config.Path() //nolint:errcheck
 			fmt.Printf("Config already exists at %s — not overwriting.\n", path)
 			return nil
 		}
 		return err
 	}
-	path, _ := config.Path()
+	path, _ := config.Path() //nolint:errcheck
 	fmt.Printf("Created default config at %s\n", path)
 	return nil
 }

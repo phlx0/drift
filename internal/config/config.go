@@ -169,7 +169,7 @@ func WriteDefault() error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 
 	_, err = f.WriteString(defaultTOML)
 	return err

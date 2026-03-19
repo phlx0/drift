@@ -22,11 +22,19 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          awk "/^## \[$VERSION\]/{found=1; next} found && /^## \[/{exit} found" CHANGELOG.md \
+            | sed '/^[[:space:]]*$/d' > /tmp/release_notes.md
+          echo "--- release notes ---"
+          cat /tmp/release_notes.md
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: "~> v2"
-          args: release --clean
+          args: release --clean --release-notes=/tmp/release_notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
