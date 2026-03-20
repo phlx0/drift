@@ -11,6 +11,15 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.3.0] — 2026-03-20
+
+### Added
+
+- **pipes** scene — box-drawing pipes snake across the screen in theme colors, wrapping at edges and resetting every 45 seconds
+- **maze** scene — a perfect maze builds itself via depth-first search, rendered as thin box-drawing lines; holds on completion, then dissolves and regenerates
+
+---
+
 ## [0.2.0] — 2026-03-20
 
 ### Fixed
@@ -85,5 +94,6 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.3.0]: https://github.com/phlx0/drift/releases/tag/v0.3.0
 [0.2.0]: https://github.com/phlx0/drift/releases/tag/v0.2.0
 [0.1.0]: https://github.com/phlx0/drift/releases/tag/v0.1.0

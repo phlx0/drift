@@ -31,6 +31,8 @@ func All() []Scene {
 		NewRain(),
 		NewParticles(),
 		NewWaveform(),
+		NewPipes(),
+		NewMaze(),
 	}
 }
 

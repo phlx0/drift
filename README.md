@@ -25,7 +25,7 @@ Every OS has a screensaver. The terminal had nothing — until now.
 
 ## Scenes
 
-drift ships four animations. They cycle automatically or you can lock to one.
+drift ships six animations. They cycle automatically or you can lock to one.
 
 <table>
 <tr>
@@ -57,6 +57,18 @@ drift ships four animations. They cycle automatically or you can lock to one.
 **particles** — a flow field of drifting glyphs
 
 <img src="demo/particles.gif" width="100%" />
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+<img src="demo/pipes.gif" width="100%" />
+
+</td>
+<td width="50%">
+
+<img src="demo/maze.gif" width="100%" />
 
 </td>
 </tr>
