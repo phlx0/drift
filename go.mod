@@ -3,7 +3,7 @@ module github.com/phlx0/drift
 go 1.23
 
 require (
-	github.com/BurntSushi/toml v1.3.2
+	github.com/BurntSushi/toml v1.6.0
 	github.com/gdamore/tcell/v2 v2.7.4
 	github.com/spf13/cobra v1.10.2
 )
