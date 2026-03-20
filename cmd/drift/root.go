@@ -84,16 +84,23 @@ func runEngine(cmd *cobra.Command, _ []string) error {
 	if flagTheme != "" {
 		cfg.Engine.Theme = flagTheme
 	}
-	if flagScene != "" {
-		cfg.Engine.Scenes = flagScene
-		cfg.Engine.CycleSeconds = 0
-		cfg.Engine.Shuffle = false
-	}
+
 	if flagFPS > 0 {
 		cfg.Engine.FPS = flagFPS
 	}
-	if flagDuration >= 0 {
+
+	durationChanged := cmd.Flags().Changed("duration")
+	if durationChanged {
 		cfg.Engine.CycleSeconds = flagDuration
+	}
+	
+	if flagScene != "" {
+		cfg.Engine.Scenes = flagScene
+		cfg.Engine.Shuffle = false
+		
+		if !durationChanged {
+			cfg.Engine.CycleSeconds = 0
+		}
 	}
 
 	e := engine.New(*cfg)
