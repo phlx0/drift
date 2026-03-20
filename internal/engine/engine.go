@@ -121,13 +121,17 @@ func (e *Engine) Run() error {
 			cur.Draw(screen)
 			screen.Show()
 
-			if e.cfg.Engine.CycleSeconds > 0 && len(e.scenes) > 1 {
+			if e.cfg.Engine.CycleSeconds > 0 {
 				e.sceneAge += dt
 				if e.sceneAge >= e.cfg.Engine.CycleSeconds {
-					e.sceneAge = 0
-					e.cur = (e.cur + 1) % len(e.scenes)
-					w, h = screen.Size()
-					e.scenes[e.cur].Init(w, h, t)
+					if len(e.scenes) > 1 {
+						e.sceneAge = 0
+						e.cur = (e.cur + 1) % len(e.scenes)
+						w, h = screen.Size()
+						e.scenes[e.cur].Init(w, h, e.theme)
+					} else {
+						return nil
+					}
 				}
 			}
 		}
