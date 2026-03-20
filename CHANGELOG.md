@@ -9,6 +9,20 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [0.2.0] — 2026-03-20
+
+### Fixed
+
+- **bash shell integration**: terminal no longer freezes when drift activates.
+  Background subshells spawned with job control enabled are placed in their own
+  process group; bash would then send `SIGTTOU` to the process when drift called
+  `tcsetattr`, suspending it and locking the terminal. The timer subshell is now
+  spawned with `set +m` so it stays in the shell's process group. A foreground
+  guard (`ps` stat check) was also added to skip activation if a command is
+  running when the timer fires.
+
 ### Added
 
 - `CODE_OF_CONDUCT.md` — Contributor Covenant 2.1
@@ -71,4 +85,5 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.2.0]: https://github.com/phlx0/drift/releases/tag/v0.2.0
 [0.1.0]: https://github.com/phlx0/drift/releases/tag/v0.1.0
