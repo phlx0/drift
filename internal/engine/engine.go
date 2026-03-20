@@ -124,7 +124,7 @@ func (e *Engine) Run() error {
 			if e.cfg.Engine.CycleSeconds > 0 {
 				e.sceneAge += dt
 				if e.sceneAge >= e.cfg.Engine.CycleSeconds {
-					e.SceneAge = 0
+					e.sceneAge = 0
 					if len(e.scenes) > 1 {
 						e.cur = (e.cur + 1) % len(e.scenes)
 						w, h = screen.Size()
