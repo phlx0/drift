@@ -96,10 +96,11 @@ func runEngine(cmd *cobra.Command, _ []string) error {
 	
 	if flagScene != "" {
 		cfg.Engine.Scenes = flagScene
-		cfg.Engine.Shuffle = false
-		
-		if !durationChanged {
-			cfg.Engine.CycleSeconds = 0
+		if !strings.Contains(flagScene, ",") {
+			cfg.Engine.Shuffle = false
+			if !durationChanged {
+				cfg.Engine.CycleSeconds = 0
+			}
 		}
 	}
 
