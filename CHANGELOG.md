@@ -9,6 +9,10 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [0.3.1] — 2026-03-20
+
 ### Changed
 
 - **CLI**: `--duration` flag now uses cobra's `Changed()` API instead of a `-1` sentinel to detect explicit user input; flag default changed from `-1` to `0`
@@ -98,6 +102,7 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.3.1]: https://github.com/phlx0/drift/releases/tag/v0.3.1
 [0.3.0]: https://github.com/phlx0/drift/releases/tag/v0.3.0
 [0.2.0]: https://github.com/phlx0/drift/releases/tag/v0.2.0
 [0.1.0]: https://github.com/phlx0/drift/releases/tag/v0.1.0
