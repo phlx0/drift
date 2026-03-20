@@ -49,11 +49,14 @@ _drift_cancel() {
 
 _drift_schedule() {
   local timeout="${DRIFT_TIMEOUT:-120}"
+  set +m
   (
     sleep "${timeout}"
+    [[ "$(ps -o stat= -p $$)" == *"+"* ]] || exit 0
     command -v drift >/dev/null 2>&1 && drift
   ) &
   _DRIFT_PID=$!
+  set -m
   disown "${_DRIFT_PID}" 2>/dev/null
 }
 
