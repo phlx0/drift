@@ -31,14 +31,14 @@ func (s *shiftScreen) SetContent(x, y int, main rune, comb []rune, style tcell.S
 type Engine struct {
 	cfg config.Config
 
-	screen      tcell.Screen
-	scenes      []scene.Scene
-	cur         int // index into scenes
-	theme       scene.Theme
-	sceneAge    float64 // seconds the current scene has been displayed
-	shiftTimer  float64 // seconds since last pixel shift
-	shiftOX     int     // current x offset for OLED pixel shift
-	shiftOY     int     // current y offset for OLED pixel shift
+	screen     tcell.Screen
+	scenes     []scene.Scene
+	cur        int // index into scenes
+	theme      scene.Theme
+	sceneAge   float64 // seconds the current scene has been displayed
+	shiftTimer float64 // seconds since last pixel shift
+	shiftOX    int     // current x offset for OLED pixel shift
+	shiftOY    int     // current y offset for OLED pixel shift
 }
 
 func New(cfg config.Config) *Engine {

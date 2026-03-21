@@ -7,10 +7,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/phlx0/drift/internal/config"
 	"github.com/phlx0/drift/internal/engine"
 	"github.com/phlx0/drift/internal/scene"
+	"github.com/spf13/cobra"
 )
 
 var (

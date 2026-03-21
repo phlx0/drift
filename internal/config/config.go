@@ -46,7 +46,7 @@ type SceneConfig struct {
 
 type ConstellationConfig struct {
 	StarCount      int     `toml:"star_count"`
-	ConnectRadius  float64 `toml:"connect_radius"`  // fraction of screen diagonal
+	ConnectRadius  float64 `toml:"connect_radius"` // fraction of screen diagonal
 	Twinkle        bool    `toml:"twinkle"`
 	MaxConnections int     `toml:"max_connections"` // per star
 }
