@@ -11,6 +11,14 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.4.0] — 2026-03-21
+
+### Fixed
+
+- **Scene config**: settings under `[scene.waveform]`, `[scene.rain]`, `[scene.constellation]`, and `[scene.particles]` in `config.toml` were parsed but never applied — scene constructors now receive and use their config values
+
+---
+
 ## [0.3.1] — 2026-03-20
 
 ### Changed
@@ -102,6 +110,7 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.4.0]: https://github.com/phlx0/drift/releases/tag/v0.4.0
 [0.3.1]: https://github.com/phlx0/drift/releases/tag/v0.3.1
 [0.3.0]: https://github.com/phlx0/drift/releases/tag/v0.3.0
 [0.2.0]: https://github.com/phlx0/drift/releases/tag/v0.2.0
