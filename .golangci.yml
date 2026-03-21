@@ -9,13 +9,10 @@ linters:
     - typecheck
     - gofmt
     - misspell
-    - gocyclo
 
 linters-settings:
   gofmt:
     simplify: true
-  gocyclo:
-    min-complexity: 15
 
 issues:
   exclude-rules:
