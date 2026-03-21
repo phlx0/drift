@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -36,6 +38,38 @@ func TestLoadReturnsDefaultsWhenNoFile(t *testing.T) {
 	}
 }
 
+func TestLoadReadsConfigWhenXDGConfigHomeUsesTilde(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("XDG_CONFIG_HOME", "~/.config")
+
+	cfgPath := filepath.Join(home, ".config", "drift", "config.toml")
+	if err := os.MkdirAll(filepath.Dir(cfgPath), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.WriteFile(cfgPath, []byte(`[engine]
+fps = 60
+
+[scene.waveform]
+layers = 1
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() error: %v", err)
+	}
+
+	if cfg.Engine.FPS != 60 {
+		t.Fatalf("expected FPS=60, got %d", cfg.Engine.FPS)
+	}
+	if cfg.Scene.Waveform.Layers != 1 {
+		t.Fatalf("expected waveform.layers=1, got %d", cfg.Scene.Waveform.Layers)
+	}
+}
+
 func TestPathUsesXDGConfigHome(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", "/tmp/testxdg")
 
@@ -45,5 +79,20 @@ func TestPathUsesXDGConfigHome(t *testing.T) {
 	}
 	if p != "/tmp/testxdg/drift/config.toml" {
 		t.Errorf("unexpected path: %s", p)
+	}
+}
+
+func TestPathExpandsTildeInXDGConfigHome(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("XDG_CONFIG_HOME", "~/.config")
+
+	p, err := Path()
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := home + "/.config/drift/config.toml"
+	if p != want {
+		t.Errorf("unexpected path: %s (want %s)", p, want)
 	}
 }
