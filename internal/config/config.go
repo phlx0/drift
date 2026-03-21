@@ -6,6 +6,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 )
@@ -159,7 +160,18 @@ func Path() (string, error) {
 			return "", err
 		}
 		base = filepath.Join(home, ".config")
+	} else if strings.HasPrefix(base, "~/") || base == "~" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		if base == "~" {
+			base = home
+		} else {
+			base = filepath.Join(home, strings.TrimPrefix(base, "~/"))
+		}
 	}
+
 	return filepath.Join(base, "drift", "config.toml"), nil
 }
 
