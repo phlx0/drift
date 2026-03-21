@@ -1,11 +1,11 @@
 ---
 name: Feature request
-about: New scene, theme, or improvement idea
+about: Suggest an improvement, config option, or CLI change
 labels: enhancement
 ---
 
 **What would you like to see?**
-<!-- describe the feature -->
+<!-- describe the feature clearly -->
 
 **Why would this be useful?**
 <!-- context, use case, or motivation -->
