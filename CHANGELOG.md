@@ -14,16 +14,26 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **rosepine** theme — Rosé Pine colorscheme; palette uses Love, Iris, Foam, and Pine accents with the base background layers as dim variants
 - **tmux status toggle** — hides the tmux status bar while drift is active and restores it on exit; opt-in via `hide_tmux_status = true` in `[engine]`
 - **automatic PR labeling** — labels applied automatically on PRs based on changed file paths and branch name prefix via `actions/labeler`
-- **Go Report Card and PRs Welcome badges** added to README
+- **platform and PRs Welcome badges** added to README
+- **scene and theme issue templates** added for structured contributions
 
 ### Changed
 
-- CONTRIBUTING.md now requires a `CHANGELOG.md` entry for every user-visible change
+- CONTRIBUTING.md requires a `CHANGELOG.md` entry for every user-visible change; `make fmt` and `make lint` documented as the standard commands
 - GitHub PR template expanded with per-type checklists for scenes and themes
-- New issue templates added: scene request and theme request
-- `make fmt` target added (`gofmt -s -w ./...`)
-- `misspell` linter added to golangci-lint
-- `gofmt` linter with `simplify: true` moved into `.golangci.yml`
+- `make fmt` target added to Makefile (`gofmt -s -w ./...`)
+- `gofmt` and `misspell` linters added to `.golangci.yml`
+- README logo centered correctly using `<pre>` tag instead of fenced code block
+
+### Fixed
+
+- `gofmt -s` formatting applied across all source files
+
+### Refactored
+
+- `wallChar` in maze scene replaced 16-case switch with a bitmask lookup table
+- `Draw` in waveform scene extracted `buildBrailleCell` helper to reduce complexity
+- `Run` in engine extracted `handleEvent` and `handleTick` helpers to reduce complexity
 
 ---
 
@@ -93,7 +103,6 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `SECURITY.md` — private vulnerability reporting via GitHub Security Advisories
 - `.github/CODEOWNERS` — all PRs auto-assigned to @phlx0
 - `.github/dependabot.yml` — weekly automated updates for GitHub Actions and Go modules
-- CI: `windows-latest` added to the test matrix
 - CI: `go mod tidy` check to catch uncommitted go.sum drift
 - Release: `go test -race` step runs before GoReleaser to gate broken releases
 
