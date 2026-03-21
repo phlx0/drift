@@ -137,18 +137,18 @@ func (e *Engine) Run() error {
 func (e *Engine) buildScenes() []scene.Scene {
 	spec := strings.TrimSpace(e.cfg.Engine.Scenes)
 	if spec == "" || spec == "all" {
-		return scene.All()
+		return scene.All(e.cfg.Scene)
 	}
 
 	var result []scene.Scene
 	for _, name := range strings.Split(spec, ",") {
 		name = strings.TrimSpace(name)
-		if s := scene.ByName(name); s != nil {
+		if s := scene.ByName(name, e.cfg.Scene); s != nil {
 			result = append(result, s)
 		}
 	}
 	if len(result) == 0 {
-		return scene.All()
+		return scene.All(e.cfg.Scene)
 	}
 	return result
 }

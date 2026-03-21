@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/phlx0/drift/internal/config"
 )
 
 type Rain struct {
@@ -20,6 +21,10 @@ type Rain struct {
 
 	charset []rune
 	speed   float64
+
+	cfgCharset string
+	cfgDensity float64
+	cfgSpeed   float64
 }
 
 type rainDrop struct {
@@ -31,20 +36,38 @@ type rainDrop struct {
 	paletteIdx int
 }
 
-func NewRain() *Rain { return &Rain{} }
+func NewRain(cfg config.RainConfig) *Rain {
+	return &Rain{
+		cfgCharset: cfg.Charset,
+		cfgDensity: cfg.Density,
+		cfgSpeed:   cfg.Speed,
+	}
+}
 
 func (r *Rain) Name() string { return "rain" }
+
+func (r *Rain) dropCount(w int) int {
+	if r.cfgDensity <= 0 {
+		return 5
+	}
+	// At default density 0.4: w/3 + 5, scales linearly with density.
+	return int(float64(w)*r.cfgDensity/1.2) + 5
+}
 
 func (r *Rain) Init(w, h int, t Theme) {
 	r.w, r.h = w, h
 	r.theme = t
 	r.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	r.charset = []rune("ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789")
-	r.speed = 1.0
+	if r.cfgCharset != "" {
+		r.charset = []rune(r.cfgCharset)
+	} else {
+		r.charset = []rune("ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789")
+	}
+	r.speed = r.cfgSpeed
 
 	r.rebuildGrid()
 
-	count := w/3 + 5
+	count := r.dropCount(w)
 	r.drops = make([]rainDrop, count)
 	for i := range r.drops {
 		r.drops[i] = r.newDrop(true)
@@ -55,7 +78,7 @@ func (r *Rain) Resize(w, h int) {
 	r.w, r.h = w, h
 	r.rebuildGrid()
 
-	count := w/3 + 5
+	count := r.dropCount(w)
 	if len(r.drops) < count {
 		extra := make([]rainDrop, count-len(r.drops))
 		for i := range extra {

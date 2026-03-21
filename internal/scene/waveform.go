@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/phlx0/drift/internal/config"
 )
 
 // brailleOffsets maps (row, col) inside a braille cell to its Unicode bit offset.
@@ -45,9 +46,19 @@ type Waveform struct {
 	layers []waveLayer
 
 	time float64
+
+	cfgLayers    int
+	cfgAmplitude float64
+	cfgSpeed     float64
 }
 
-func NewWaveform() *Waveform { return &Waveform{} }
+func NewWaveform(cfg config.WaveformConfig) *Waveform {
+	return &Waveform{
+		cfgLayers:    cfg.Layers,
+		cfgAmplitude: cfg.Amplitude,
+		cfgSpeed:     cfg.Speed,
+	}
+}
 
 func (wf *Waveform) Name() string { return "waveform" }
 
@@ -56,49 +67,37 @@ func (wf *Waveform) Init(w, h int, t Theme) {
 	wf.theme = t
 	wf.pw, wf.ph = w*2, h*4
 	wf.allocPixels()
+	wf.buildLayers()
+}
 
-	baseAmp := float64(wf.ph) * 0.22
-	wf.layers = []waveLayer{
-		{
-			freq:  2.0,
-			amp:   baseAmp,
-			speed: 0.45,
-			phase: 0,
-			color: t.Palette[0%len(t.Palette)],
-		},
-		{
-			freq:  3.7,
-			amp:   baseAmp * 0.65,
-			speed: -0.70,
-			phase: math.Pi / 3,
-			color: t.Palette[1%len(t.Palette)],
-		},
-		{
-			freq:  1.2,
-			amp:   baseAmp * 0.45,
-			speed: 0.28,
-			phase: math.Pi,
-			color: t.Palette[2%len(t.Palette)],
-		},
+// buildLayers (re)builds the wave layer slice from stored config and theme.
+// Called from Init and Resize so both paths stay in sync.
+func (wf *Waveform) buildLayers() {
+	// amplitude * 0.31 gives ~22% of pixel height at the default value of 0.70.
+	baseAmp := float64(wf.ph) * wf.cfgAmplitude * 0.31
+
+	numLayers := wf.cfgLayers
+	if numLayers < 1 {
+		numLayers = 1
 	}
+	if numLayers > 3 {
+		numLayers = 3
+	}
+
+	pal := wf.theme.Palette
+	all := []waveLayer{
+		{freq: 2.0, amp: baseAmp, speed: 0.45 * wf.cfgSpeed, phase: 0, color: pal[0%len(pal)]},
+		{freq: 3.7, amp: baseAmp * 0.65, speed: -0.70 * wf.cfgSpeed, phase: math.Pi / 3, color: pal[1%len(pal)]},
+		{freq: 1.2, amp: baseAmp * 0.45, speed: 0.28 * wf.cfgSpeed, phase: math.Pi, color: pal[2%len(pal)]},
+	}
+	wf.layers = all[:numLayers]
 }
 
 func (wf *Waveform) Resize(w, h int) {
 	wf.w, wf.h = w, h
 	wf.pw, wf.ph = w*2, h*4
 	wf.allocPixels()
-
-	baseAmp := float64(wf.ph) * 0.22
-	for i := range wf.layers {
-		switch i {
-		case 0:
-			wf.layers[i].amp = baseAmp
-		case 1:
-			wf.layers[i].amp = baseAmp * 0.65
-		case 2:
-			wf.layers[i].amp = baseAmp * 0.45
-		}
-	}
+	wf.buildLayers()
 }
 
 func (wf *Waveform) allocPixels() {

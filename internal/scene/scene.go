@@ -4,6 +4,7 @@ package scene
 
 import (
 	"github.com/gdamore/tcell/v2"
+	"github.com/phlx0/drift/internal/config"
 )
 
 // Scene is the interface every drift animation must implement.
@@ -25,19 +26,25 @@ type Scene interface {
 	Resize(w, h int)
 }
 
-func All() []Scene {
+// All returns fresh instances of every scene, configured with the optional
+// SceneConfig. If no config is provided, compiled-in defaults are used.
+func All(cfgs ...config.SceneConfig) []Scene {
+	cfg := config.Default().Scene
+	if len(cfgs) > 0 {
+		cfg = cfgs[0]
+	}
 	return []Scene{
-		NewConstellation(),
-		NewRain(),
-		NewParticles(),
-		NewWaveform(),
+		NewConstellation(cfg.Constellation),
+		NewRain(cfg.Rain),
+		NewParticles(cfg.Particles),
+		NewWaveform(cfg.Waveform),
 		NewPipes(),
 		NewMaze(),
 	}
 }
 
-func ByName(name string) Scene {
-	for _, s := range All() {
+func ByName(name string, cfgs ...config.SceneConfig) Scene {
+	for _, s := range All(cfgs...) {
 		if s.Name() == name {
 			return s
 		}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/phlx0/drift/internal/config"
 )
 
 // starGlyphs ordered from faintest to brightest.
@@ -21,6 +22,11 @@ type Constellation struct {
 
 	connectDist    float64 // pixel distance threshold for connections
 	maxConnections int
+
+	cfgStarCount      int
+	cfgConnectRadius  float64
+	cfgTwinkle        bool
+	cfgMaxConnections int
 }
 
 type star struct {
@@ -32,7 +38,14 @@ type star struct {
 	paletteIdx  int
 }
 
-func NewConstellation() *Constellation { return &Constellation{} }
+func NewConstellation(cfg config.ConstellationConfig) *Constellation {
+	return &Constellation{
+		cfgStarCount:      cfg.StarCount,
+		cfgConnectRadius:  cfg.ConnectRadius,
+		cfgTwinkle:        cfg.Twinkle,
+		cfgMaxConnections: cfg.MaxConnections,
+	}
+}
 
 func (c *Constellation) Name() string { return "constellation" }
 
@@ -40,11 +53,10 @@ func (c *Constellation) Init(w, h int, t Theme) {
 	c.w, c.h = w, h
 	c.theme = t
 	c.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	c.connectDist = math.Sqrt(float64(w*w+h*h)) * 0.18
-	c.maxConnections = 4
+	c.connectDist = math.Sqrt(float64(w*w+h*h)) * c.cfgConnectRadius
+	c.maxConnections = c.cfgMaxConnections
 
-	count := 80
-	c.stars = make([]star, count)
+	c.stars = make([]star, c.cfgStarCount)
 	for i := range c.stars {
 		c.stars[i] = c.randomStar(true)
 	}
@@ -52,7 +64,7 @@ func (c *Constellation) Init(w, h int, t Theme) {
 
 func (c *Constellation) Resize(w, h int) {
 	c.w, c.h = w, h
-	c.connectDist = math.Sqrt(float64(w*w+h*h)) * 0.18
+	c.connectDist = math.Sqrt(float64(w*w+h*h)) * c.cfgConnectRadius
 	for i := range c.stars {
 		s := &c.stars[i]
 		if s.x >= float64(w) || s.y >= float64(h) {
@@ -80,13 +92,17 @@ func (c *Constellation) randomStar(scattered bool) star {
 			x, y = float64(c.w-1), c.rng.Float64()*float64(c.h)
 		}
 	}
+	twinkleFreq := 0.4 + c.rng.Float64()*0.8
+	if !c.cfgTwinkle {
+		twinkleFreq = 0
+	}
 	return star{
 		x:           x,
 		y:           y,
 		vx:          math.Cos(angle) * speed,
 		vy:          math.Sin(angle) * speed,
 		twinkle:     c.rng.Float64() * 2 * math.Pi,
-		twinkleFreq: 0.4 + c.rng.Float64()*0.8,
+		twinkleFreq: twinkleFreq,
 		glyphIdx:    c.rng.Intn(len(starGlyphs)),
 		paletteIdx:  c.rng.Intn(len(c.theme.Palette)),
 	}

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/phlx0/drift/internal/config"
 )
 
 var particleGlyphs = []rune{'◦', '·', '○', '•', '.', '°', '∘'}
@@ -21,6 +22,10 @@ type Particles struct {
 	rng      *rand.Rand
 	gravity  float64
 	friction float64
+
+	cfgCount    int
+	cfgGravity  float64
+	cfgFriction float64
 }
 
 type particle struct {
@@ -31,7 +36,13 @@ type particle struct {
 	phase      float64 // shimmer offset
 }
 
-func NewParticles() *Particles { return &Particles{gravity: 0, friction: 0.98} }
+func NewParticles(cfg config.ParticlesConfig) *Particles {
+	return &Particles{
+		cfgCount:    cfg.Count,
+		cfgGravity:  cfg.Gravity,
+		cfgFriction: cfg.Friction,
+	}
+}
 
 func (p *Particles) Name() string { return "particles" }
 
@@ -39,11 +50,12 @@ func (p *Particles) Init(w, h int, t Theme) {
 	p.w, p.h = w, h
 	p.theme = t
 	p.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+	p.gravity = p.cfgGravity
+	p.friction = p.cfgFriction
 
 	p.rebuildTrail()
 
-	count := 120
-	p.particles = make([]particle, count)
+	p.particles = make([]particle, p.cfgCount)
 	for i := range p.particles {
 		p.particles[i] = p.newParticle(true)
 	}
