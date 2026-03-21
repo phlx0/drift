@@ -9,10 +9,14 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [0.5.0] — 2026-03-21
+
 ### Added
 
-- **OLED pixel shift**: the engine nudges the entire rendered image by one cell every 10 seconds, cycling through a 3×3 grid (90-second full cycle). Keeps every pixel in motion and reduces burn-in risk on OLED displays. Implemented once in the engine — all scenes benefit automatically. Closes #14
-- **life** scene — Conway's Game of Life on a toroidal grid; newborn cells flash bright, age through the palette, then fade to dim variants. Resets after `reset_seconds` or after 3 seconds of stagnation. Configurable via `[scene.life]`: `density`, `speed`, `reset_seconds`
+- **life** scene — Conway's Game of Life on a toroidal grid; newborn cells flash bright, age through the theme palette, then fade to dim variants for visual depth. Auto-resets after `reset_seconds` or after 3 seconds of stagnation. Configurable via `[scene.life]`: `density`, `speed`, `reset_seconds`
+- **OLED pixel shift** — the engine nudges the entire rendered image by one cell every 10 seconds, cycling through a 3×3 grid (90-second full cycle). Reduces burn-in risk on OLED displays; all scenes benefit automatically with no per-scene changes. Closes #14
 
 ---
 
@@ -129,6 +133,7 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.5.0]: https://github.com/phlx0/drift/releases/tag/v0.5.0
 [0.4.1]: https://github.com/phlx0/drift/releases/tag/v0.4.1
 [0.4.0]: https://github.com/phlx0/drift/releases/tag/v0.4.0
 [0.3.1]: https://github.com/phlx0/drift/releases/tag/v0.3.1
