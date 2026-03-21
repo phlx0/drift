@@ -91,9 +91,10 @@ drift ships seven animations. They cycle automatically or you can lock to one.
 
 ## Themes
 
-Eight built-in themes matched to popular terminal colorschemes.
+Nine built-in themes matched to popular terminal colorschemes.
 
-`cosmic` · `nord` · `dracula` · `catppuccin` · `gruvbox` · `forest` · `wildberries` · `mono`
+`cosmic` · `nord` · `dracula` · `catppuccin` · `gruvbox` · `forest` · `wildberries` · `mono` · `rosepine`
+
 
 ```bash
 drift list themes    # preview all themes with color swatches

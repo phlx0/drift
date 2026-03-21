@@ -233,6 +233,22 @@ var Themes = map[string]Theme{
 		},
 		Bright: RGBColor{180, 255, 200},
 	},
+	"rosepine": {
+		Name: "rosepine",
+		Palette: []RGBColor{
+			{235, 111, 146},
+			{196, 167, 231},
+			{156, 207, 216},
+			{49, 116, 143},
+		},
+		Dim: []RGBColor{
+			{25, 23, 36},
+			{31, 29, 46},
+			{38, 35, 58},
+			{28, 26, 42},
+		},
+		Bright: RGBColor{224, 222, 244},
+	},
 }
 
 func ThemeNames() []string {

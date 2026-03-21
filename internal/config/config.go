@@ -222,7 +222,7 @@ timeout = 120
 fps           = 30     # target frames per second
 cycle_seconds = 60     # seconds per scene, 0 = stay on one scene
 scenes        = "all"  # comma-separated list or "all"
-theme         = "cosmic" # cosmic | nord | dracula | catppuccin | gruvbox | forest | wildberries | mono
+theme         = "cosmic" # cosmic | nord | dracula | catppuccin | gruvbox | forest | wildberries | mono | rosepine
 shuffle       = true   # randomise scene order
 
 [scene.constellation]
