@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or general discussion
+    url: https://github.com/phlx0/drift/discussions
+    about: For questions, ideas, or anything that isn't a bug or feature request
