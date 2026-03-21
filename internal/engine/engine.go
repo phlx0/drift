@@ -12,14 +12,33 @@ import (
 	"github.com/phlx0/drift/internal/scene"
 )
 
+// shiftScreen wraps tcell.Screen and translates every SetContent call by
+// (ox, oy), discarding writes that land outside the physical screen bounds.
+// All other Screen methods delegate to the underlying screen unchanged.
+type shiftScreen struct {
+	tcell.Screen
+	ox, oy int
+}
+
+func (s *shiftScreen) SetContent(x, y int, main rune, comb []rune, style tcell.Style) {
+	w, h := s.Screen.Size()
+	nx, ny := x+s.ox, y+s.oy
+	if nx >= 0 && nx < w && ny >= 0 && ny < h {
+		s.Screen.SetContent(nx, ny, main, comb, style)
+	}
+}
+
 type Engine struct {
 	cfg config.Config
 
-	screen   tcell.Screen
-	scenes   []scene.Scene
-	cur      int // index into scenes
-	theme    scene.Theme
-	sceneAge float64 // seconds the current scene has been displayed
+	screen      tcell.Screen
+	scenes      []scene.Scene
+	cur         int // index into scenes
+	theme       scene.Theme
+	sceneAge    float64 // seconds the current scene has been displayed
+	shiftTimer  float64 // seconds since last pixel shift
+	shiftOX     int     // current x offset for OLED pixel shift
+	shiftOY     int     // current y offset for OLED pixel shift
 }
 
 func New(cfg config.Config) *Engine {
@@ -114,11 +133,24 @@ func (e *Engine) Run() error {
 				dt = 0.1
 			}
 
+			// Advance OLED pixel shift: nudge by 1 cell every 10 seconds,
+			// cycling through a 3×3 grid so every position resets to (0,0)
+			// after 90 seconds.
+			e.shiftTimer += dt
+			if e.shiftTimer >= 10.0 {
+				e.shiftTimer -= 10.0
+				e.shiftOX = (e.shiftOX + 1) % 3
+				if e.shiftOX == 0 {
+					e.shiftOY = (e.shiftOY + 1) % 3
+				}
+			}
+
 			cur := e.scenes[e.cur]
 			cur.Update(dt)
 
+			shifted := &shiftScreen{Screen: screen, ox: e.shiftOX, oy: e.shiftOY}
 			screen.Fill(' ', tcell.StyleDefault)
-			cur.Draw(screen)
+			cur.Draw(shifted)
 			screen.Show()
 
 			if e.cfg.Engine.CycleSeconds > 0 && len(e.scenes) > 1 {
