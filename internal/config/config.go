@@ -201,8 +201,9 @@ const defaultTOML = `# drift configuration
 # Full documentation: https://github.com/phlx0/drift
 
 [idle]
-# Seconds of inactivity before drift activates (standalone mode).
-# Shell integration uses TMOUT / DRIFT_TIMEOUT instead.
+# Informational only — changing this value has no effect.
+# The shell integration controls idle activation via DRIFT_TIMEOUT (bash/fish)
+# or TMOUT (zsh). Set that in your shell config to change the timeout.
 timeout = 120
 
 [engine]
