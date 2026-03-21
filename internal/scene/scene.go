@@ -40,6 +40,7 @@ func All(cfgs ...config.SceneConfig) []Scene {
 		NewWaveform(cfg.Waveform),
 		NewPipes(cfg.Pipes),
 		NewMaze(cfg.Maze),
+		NewCherries(cfg.Cherries),
 	}
 }
 
