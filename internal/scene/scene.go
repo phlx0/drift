@@ -99,15 +99,15 @@ func Lerp(a, b RGBColor, t float64) RGBColor {
 
 // Theme holds the color palette for a scene.
 type Theme struct {
-	Name    string
+	Name string
 	// Palette is an ordered slice of accent colors.
 	// Scenes use Palette[i % len(Palette)] to stay in-bounds.
 	Palette []RGBColor
 	// Dim mirrors Palette with darker / more muted variants for trails and
 	// depth effects.
-	Dim     []RGBColor
+	Dim []RGBColor
 	// Bright is used for highlights (star centers, raindrop heads, etc.).
-	Bright  RGBColor
+	Bright RGBColor
 }
 
 // Themes is the registry of all built-in color themes.
@@ -255,4 +255,3 @@ func clamp64(v, lo, hi float64) float64 {
 	}
 	return v
 }
-
