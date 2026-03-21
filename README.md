@@ -1,10 +1,10 @@
 <div align="center">
 
-```
+<pre>
 ·  ·    ·        ·     ·    ·  ·
     ·      d r i f t      ·
   ·    ·        ·    ·       ·
-```
+</pre>
 
 **A terminal screensaver that turns idle time into ambient art.**
 
