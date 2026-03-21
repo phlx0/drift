@@ -155,7 +155,9 @@ Branch off `main`. Do not commit directly to `main`.
 
 4. Add a config struct to `internal/config/config.go` if the scene has tunable knobs, and wire it to `SceneConfig`.
 
-5. Test it:
+5. Add an entry to `CHANGELOG.md` under `## [Unreleased]` describing the new scene.
+
+6. Test it:
    ```bash
    go build . && ./drift --scene myscene
    ```
@@ -196,6 +198,8 @@ Open `internal/scene/scene.go` and add an entry to the `Themes` map:
 
 Also update the theme comment in `internal/config/config.go` to include your theme name in the inline list.
 
+Add an entry to `CHANGELOG.md` under `## [Unreleased]` describing the new theme.
+
 Run `./drift list themes` to confirm it appears.
 
 ---
@@ -231,9 +235,10 @@ For automated tests, prefer testing pure functions (math helpers, config parsing
 1. Fork the repo and create a branch off `main` using the naming convention above.
 2. Write commits following the Conventional Commits format.
 3. Keep commits focused — one logical change per commit.
-4. Run `make test` and `go vet ./...` before opening the PR.
-5. Fill in the PR description template.
-6. Screenshots or terminal recordings of new scenes / visual changes are very welcome.
+4. Add an entry to `CHANGELOG.md` under `## [Unreleased]` for every user-visible change.
+5. Run `make test` and `go vet ./...` before opening the PR.
+6. Fill in the PR description template.
+7. Screenshots or terminal recordings of new scenes / visual changes are very welcome.
 
 We review PRs as time allows. Patience is appreciated.
 
