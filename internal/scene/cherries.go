@@ -1,7 +1,6 @@
 package scene
 
 import (
-	"math"
 	"math/rand"
 	"time"
 
@@ -9,102 +8,83 @@ import (
 	"github.com/phlx0/drift/internal/config"
 )
 
-type decoration struct {
-	x, y int
-	char rune
-	col  tcell.Style
+// Cherries scene
+type Cherries struct {
+	cfg       config.CherriesConfig
+	width     int
+	height    int
+	positions []Position
+	r         *rand.Rand
 }
 
-type OrbitalCherries struct {
-	w, h        int
-	theme       Theme
-	t           float64
-	cfg         config.CherriesConfig
-	decorations []decoration
+type Position struct {
+	X, Y int
 }
 
-func NewCherries(cfg config.CherriesConfig) Scene {
-	return &OrbitalCherries{
-		cfg: cfg,
+// NewCherries creates a new Cherries scene.
+func NewCherries(cfg config.CherriesConfig) *Cherries {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	positions := make([]Position, cfg.NumCherries)
+	for i := range positions {
+		positions[i] = Position{
+			X: r.Intn(80), // default, will resize in Init
+			Y: r.Intn(24),
+		}
+	}
+	return &Cherries{
+		cfg:       cfg,
+		positions: positions,
+		r:         r,
 	}
 }
 
-func (c *OrbitalCherries) Name() string {
+func (c *Cherries) Name() string {
 	return "cherries"
 }
 
-func (c *OrbitalCherries) Init(w, h int, t Theme) {
-	c.w = w
-	c.h = h
-	c.theme = t
-	c.t = float64(time.Now().UnixNano()) / 1e9
-
-	rand.Seed(time.Now().UnixNano())
-
-	// generate decorations once
-	c.decorations = []decoration{}
-	cx := c.w / 2
-	cy := c.h / 2
-	radius := float64(min(c.w, c.h) / 4)
-	margin := int(radius) + 3
-
-	for i := 0; i < c.cfg.Decorations; i++ {
-		var sx, sy int
-		for {
-			sx = rand.Intn(c.w)
-			sy = rand.Intn(c.h)
-			dx := sx - cx
-			dy := sy - cy
-			dist := math.Hypot(float64(dx), float64(dy))
-			if int(dist) > margin {
-				break
-			}
+// Init sets up the scene dimensions
+func (c *Cherries) Init(w, h int, t Theme) {
+	c.width = w
+	c.height = h
+	for i := range c.positions {
+		c.positions[i] = Position{
+			X: c.r.Intn(w),
+			Y: c.r.Intn(h),
 		}
-		r := []rune{'*', '+', '.', '♥', '•'}[rand.Intn(5)]
-		color := tcell.StyleDefault.Foreground(tcell.NewRGBColor(
-			int32(rand.Intn(256)), int32(rand.Intn(256)), int32(rand.Intn(256))))
-		c.decorations = append(c.decorations, decoration{x: sx, y: sy, char: r, col: color})
 	}
 }
 
-func (c *OrbitalCherries) Update(dt float64) {
-	c.t += dt * c.cfg.Speed
-}
+// Update moves cherries around (simple example)
+func (c *Cherries) Update(dt float64) {
+	for i := range c.positions {
+		// Move randomly
+		c.positions[i].X += c.r.Intn(3) - 1
+		c.positions[i].Y += c.r.Intn(3) - 1
 
-func (c *OrbitalCherries) Draw(screen tcell.Screen) {
-	cx := c.w / 2
-	cy := c.h / 2
-	radius := float64(min(c.w, c.h) / 4)
-
-	red := tcell.NewRGBColor(220, 40, 80)
-	green := tcell.NewRGBColor(80, 200, 120)
-	fruit := tcell.StyleDefault.Foreground(red)
-	stem := tcell.StyleDefault.Foreground(green)
-
-	numCherries := c.cfg.NumCherries
-	for i := 0; i < numCherries; i++ {
-		angle := c.t + float64(i)*2*math.Pi/float64(numCherries)
-		x := cx + int(radius*math.Cos(angle))
-		y := cy + int(radius*math.Sin(angle))
-
-		screen.SetContent(x, y-1, '|', nil, stem)
-		screen.SetContent(x+1, y-1, '/', nil, stem)
-		screen.SetContent(x, y, 'o', nil, fruit)
-	}
-
-	// draw decorations (static)
-	for _, d := range c.decorations {
-		screen.SetContent(d.x, d.y, d.char, nil, d.col)
+		// Wrap around
+		if c.positions[i].X < 0 {
+			c.positions[i].X = c.width - 1
+		} else if c.positions[i].X >= c.width {
+			c.positions[i].X = 0
+		}
+		if c.positions[i].Y < 0 {
+			c.positions[i].Y = c.height - 1
+		} else if c.positions[i].Y >= c.height {
+			c.positions[i].Y = 0
+		}
 	}
 }
 
-func (c *OrbitalCherries) Resize(w, h int) {
-	c.Init(w, h, c.theme)
+// Draw renders the cherries
+func (c *Cherries) Draw(screen tcell.Screen) {
+	style := tcell.StyleDefault.Foreground(tcell.ColorRed)
+	for _, pos := range c.positions {
+		screen.SetContent(pos.X, pos.Y, '🍒', nil, style)
+	}
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+// Resize updates scene dimensions
+func (c *Cherries) Resize(w, h int) {
+	c.width = w
+	c.height = h
 }
