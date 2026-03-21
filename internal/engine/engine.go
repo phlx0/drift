@@ -4,6 +4,8 @@ package engine
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -48,6 +50,12 @@ func New(cfg config.Config) *Engine {
 // Run initialises the terminal and blocks until a keypress or click.
 // The terminal is fully restored on return regardless of how Run exits.
 func (e *Engine) Run() error {
+	if e.cfg.Engine.HideTmuxStatus && os.Getenv("TMUX") != "" {
+		if err := exec.Command("tmux", "set", "status", "off").Run(); err == nil {
+			defer func() { _ = exec.Command("tmux", "set", "status", "on").Run() }()
+		}
+	}
+
 	screen, err := tcell.NewScreen()
 	if err != nil {
 		return fmt.Errorf("create screen: %w", err)

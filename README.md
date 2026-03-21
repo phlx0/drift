@@ -216,11 +216,12 @@ drift config --init   # writes ~/.config/drift/config.toml
 
 ```toml
 [engine]
-fps           = 30
-cycle_seconds = 60    # 0 = stay on one scene
-scenes        = "all"
-theme         = "cosmic"
-shuffle       = true
+fps              = 30
+cycle_seconds    = 60    # 0 = stay on one scene
+scenes           = "all"
+theme            = "cosmic"
+shuffle          = true
+hide_tmux_status = false
 
 [scene.constellation]
 star_count      = 80

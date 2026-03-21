@@ -205,6 +205,7 @@ func showConfig() error {
 	fmt.Printf("cycle_seconds: %.0f\n", cfg.Engine.CycleSeconds)
 	fmt.Printf("scenes:        %s\n", cfg.Engine.Scenes)
 	fmt.Printf("shuffle:       %v\n", cfg.Engine.Shuffle)
+	fmt.Printf("hide_tmux_status: %v\n", cfg.Engine.HideTmuxStatus)
 	return nil
 }
 

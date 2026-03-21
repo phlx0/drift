@@ -32,6 +32,8 @@ type EngineConfig struct {
 	Scenes  string `toml:"scenes"`
 	Theme   string `toml:"theme"`
 	Shuffle bool   `toml:"shuffle"`
+	// runs `tmux set status off` while drift runs when inside tmux.
+	HideTmuxStatus bool `toml:"hide_tmux_status"`
 }
 
 type SceneConfig struct {
@@ -224,6 +226,7 @@ cycle_seconds = 60     # seconds per scene, 0 = stay on one scene
 scenes        = "all"  # comma-separated list or "all"
 theme         = "cosmic" # cosmic | nord | dracula | catppuccin | gruvbox | forest | wildberries | mono | rosepine
 shuffle       = true   # randomise scene order
+hide_tmux_status = false  # tmux: hide status bar while displaying scene
 
 [scene.constellation]
 star_count      = 80
