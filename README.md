@@ -80,9 +80,9 @@ drift ships six animations. They cycle automatically or you can lock to one.
 
 ## Themes
 
-Seven built-in themes matched to popular terminal colorschemes.
+Eight built-in themes matched to popular terminal colorschemes.
 
-`cosmic` · `nord` · `dracula` · `catppuccin` · `gruvbox` · `forest` · `mono`
+`cosmic` · `nord` · `dracula` · `catppuccin` · `gruvbox` · `forest` · `wildberries` · `mono`
 
 ```bash
 drift list themes    # preview all themes with color swatches
@@ -154,6 +154,7 @@ eval "$(drift shell-init zsh)"
 
 ```bash
 # add to ~/.bashrc
+export DRIFT_TIMEOUT=120   # seconds of inactivity (default: 120)
 eval "$(drift shell-init bash)"
 ```
 
@@ -161,6 +162,7 @@ eval "$(drift shell-init bash)"
 
 ```fish
 # add to ~/.config/fish/conf.d/drift.fish
+set -x DRIFT_TIMEOUT 120   # seconds of inactivity (default: 120)
 drift shell-init fish | source
 ```
 
@@ -225,6 +227,17 @@ friction = 0.98
 layers    = 3
 amplitude = 0.70
 speed     = 1.0
+
+[scene.pipes]
+heads         = 6
+turn_chance   = 0.15
+speed         = 1.0
+reset_seconds = 45.0
+
+[scene.maze]
+pause_seconds = 3.0
+fade_seconds  = 2.0
+speed         = 1.0
 ```
 
 ---
