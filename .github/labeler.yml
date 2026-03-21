@@ -1,0 +1,56 @@
+# Automatic PR labeling rules for actions/labeler
+# Docs: https://github.com/actions/labeler
+
+scene:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'internal/scene/**'
+      - '!internal/scene/scene.go'
+
+theme:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'internal/scene/scene.go'
+
+config:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'internal/config/**'
+
+engine:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'internal/engine/**'
+
+cli:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'cmd/**'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**'
+      - '.goreleaser.yml'
+      - 'Makefile'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'go.mod'
+      - 'go.sum'
+
+bug:
+  - head-branch:
+    - '^fix\/'
+
+enhancement:
+  - head-branch:
+    - '^feat\/'
