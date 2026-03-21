@@ -9,6 +9,10 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **rosepine** theme — Rosé Pine colorscheme; palette uses Love, Iris, Foam, and Pine accents with the base background layers as dim variants
+
 ---
 
 ## [0.5.0] — 2026-03-21
