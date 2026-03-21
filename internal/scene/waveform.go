@@ -4,10 +4,10 @@ import (
 	"math"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/phlx0/drift/internal/config"
 )
 
-// brailleOffsets maps (row, col) inside a braille cell to its Unicode bit offset.
+// brailleOffsets[row][col] gives the Unicode bit offset for the dot at
+// (col, row) inside a braille cell (col ∈ {0,1}, row ∈ {0,1,2,3}).
 //
 // Unicode braille bit layout (U+2800 base):
 //
@@ -25,17 +25,17 @@ var brailleOffsets = [4][2]uint{
 
 // waveLayer is one sine wave in the stack.
 type waveLayer struct {
-	freq  float64 // spatial cycles across the full width
-	amp   float64 // amplitude in pixels (not characters)
-	speed float64 // radians per second (positive = rightward)
-	phase float64 // initial phase offset (radians)
+	freq  float64  // spatial cycles across the full width
+	amp   float64  // base amplitude in pixels (not characters)
+	speed float64  // radians per second (positive = rightward)
+	phase float64  // initial phase offset (radians)
 	color RGBColor
 }
 
 // Waveform renders multiple breathing sine waves using braille Unicode
-// characters for sub-character precision (2×4 dots per terminal cell).
+// characters for sub-character precision, giving smooth, animated curves.
 type Waveform struct {
-	w, h  int
+	w, h int
 	theme Theme
 
 	// Pixel resolution: pw = w*2, ph = h*4
@@ -46,19 +46,10 @@ type Waveform struct {
 	layers []waveLayer
 
 	time float64
-
-	cfgLayers    int
-	cfgAmplitude float64
-	cfgSpeed     float64
 }
 
-func NewWaveform(cfg config.WaveformConfig) *Waveform {
-	return &Waveform{
-		cfgLayers:    cfg.Layers,
-		cfgAmplitude: cfg.Amplitude,
-		cfgSpeed:     cfg.Speed,
-	}
-}
+// NewWaveform returns a fresh Waveform scene.
+func NewWaveform() *Waveform { return &Waveform{} }
 
 func (wf *Waveform) Name() string { return "waveform" }
 
@@ -67,37 +58,49 @@ func (wf *Waveform) Init(w, h int, t Theme) {
 	wf.theme = t
 	wf.pw, wf.ph = w*2, h*4
 	wf.allocPixels()
-	wf.buildLayers()
-}
 
-// buildLayers (re)builds the wave layer slice from stored config and theme.
-// Called from Init and Resize so both paths stay in sync.
-func (wf *Waveform) buildLayers() {
-	// amplitude * 0.31 gives ~22% of pixel height at the default value of 0.70.
-	baseAmp := float64(wf.ph) * wf.cfgAmplitude * 0.31
-
-	numLayers := wf.cfgLayers
-	if numLayers < 1 {
-		numLayers = 1
+	baseAmp := float64(wf.ph) * 0.22 // ~22% of screen height in pixels
+	wf.layers = []waveLayer{
+		{
+			freq:  2.0,
+			amp:   baseAmp,
+			speed: 0.45,
+			phase: 0,
+			color: t.Palette[0%len(t.Palette)],
+		},
+		{
+			freq:  3.7,
+			amp:   baseAmp * 0.65,
+			speed: -0.70,
+			phase: math.Pi / 3,
+			color: t.Palette[1%len(t.Palette)],
+		},
+		{
+			freq:  1.2,
+			amp:   baseAmp * 0.45,
+			speed: 0.28,
+			phase: math.Pi,
+			color: t.Palette[2%len(t.Palette)],
+		},
 	}
-	if numLayers > 3 {
-		numLayers = 3
-	}
-
-	pal := wf.theme.Palette
-	all := []waveLayer{
-		{freq: 2.0, amp: baseAmp, speed: 0.45 * wf.cfgSpeed, phase: 0, color: pal[0%len(pal)]},
-		{freq: 3.7, amp: baseAmp * 0.65, speed: -0.70 * wf.cfgSpeed, phase: math.Pi / 3, color: pal[1%len(pal)]},
-		{freq: 1.2, amp: baseAmp * 0.45, speed: 0.28 * wf.cfgSpeed, phase: math.Pi, color: pal[2%len(pal)]},
-	}
-	wf.layers = all[:numLayers]
 }
 
 func (wf *Waveform) Resize(w, h int) {
 	wf.w, wf.h = w, h
 	wf.pw, wf.ph = w*2, h*4
 	wf.allocPixels()
-	wf.buildLayers()
+
+	baseAmp := float64(wf.ph) * 0.22
+	for i := range wf.layers {
+		switch i {
+		case 0:
+			wf.layers[i].amp = baseAmp
+		case 1:
+			wf.layers[i].amp = baseAmp * 0.65
+		case 2:
+			wf.layers[i].amp = baseAmp * 0.45
+		}
+	}
 }
 
 func (wf *Waveform) allocPixels() {
@@ -112,6 +115,7 @@ func (wf *Waveform) Update(dt float64) {
 }
 
 func (wf *Waveform) Draw(screen tcell.Screen) {
+	// Clear pixel buffer.
 	for px := range wf.pixels {
 		for py := range wf.pixels[px] {
 			wf.pixels[px][py] = 0
@@ -120,16 +124,18 @@ func (wf *Waveform) Draw(screen tcell.Screen) {
 
 	centerPY := wf.ph / 2
 
+	// Paint each wave layer into the pixel buffer.
 	for li, layer := range wf.layers {
-		// Amplitude breathes slowly over time.
+		// Breathing: amplitude slowly oscillates.
 		breathe := 0.72 + 0.28*math.Sin(wf.time*0.38+float64(li)*1.1)
 		amp := layer.amp * breathe
 
 		for px := 0; px < wf.pw; px++ {
+			// Map pixel column to [0, 1] and evaluate sine.
 			fx := float64(px) / float64(wf.pw)
 			py := centerPY + int(amp*math.Sin(fx*layer.freq*2*math.Pi+layer.phase+wf.time*layer.speed))
 
-			// 2-pixel thick line for visibility at small amplitudes.
+			// Draw 2-pixel thick line for visibility.
 			for offset := 0; offset <= 1; offset++ {
 				yy := py + offset
 				if yy >= 0 && yy < wf.ph {
@@ -139,11 +145,11 @@ func (wf *Waveform) Draw(screen tcell.Screen) {
 		}
 	}
 
-	// Convert pixel buffer → braille characters → screen.
+	// Convert pixel buffer → braille cells → screen.
 	for cx := 0; cx < wf.w; cx++ {
 		for cy := 0; cy < wf.h; cy++ {
 			var mask uint8
-			// waveCounts[li] = dots contributed by layer li in this cell.
+			// waveCounts[li] = number of bits set by layer li in this cell.
 			var waveCounts [3]int
 
 			for subRow := 0; subRow < 4; subRow++ {
@@ -169,7 +175,7 @@ func (wf *Waveform) Draw(screen tcell.Screen) {
 				continue
 			}
 
-			// Color from the wave that contributed the most dots.
+			// Choose color from the wave that contributed the most bits.
 			bestWave := 0
 			for li := 1; li < len(wf.layers); li++ {
 				if waveCounts[li] > waveCounts[bestWave] {
@@ -178,6 +184,7 @@ func (wf *Waveform) Draw(screen tcell.Screen) {
 			}
 
 			color := wf.layers[bestWave].color
+			// Add a slight brightness boost toward Bright based on density.
 			totalBits := waveCounts[0] + waveCounts[1] + waveCounts[2]
 			if totalBits > 0 {
 				boost := clamp64(float64(totalBits)/8.0, 0, 1) * 0.35

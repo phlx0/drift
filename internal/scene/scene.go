@@ -4,47 +4,44 @@ package scene
 
 import (
 	"github.com/gdamore/tcell/v2"
-	"github.com/phlx0/drift/internal/config"
 )
 
 // Scene is the interface every drift animation must implement.
 // The engine calls methods in order: Init → (Update → Draw)* → Resize → …
 type Scene interface {
+	// Name returns the unique scene identifier used in flags and config.
 	Name() string
 
 	// Init initialises the scene for the given terminal dimensions and theme.
-	// Called once when the scene becomes active and again after every Resize.
+	// Called once when the scene becomes active and after every Resize.
 	Init(w, h int, t Theme)
 
 	// Update advances the simulation by dt seconds.
+	// Must be safe to call at any frame rate.
 	Update(dt float64)
 
 	// Draw renders the current state onto the screen.
-	// Must NOT call screen.Show() — the engine owns flushing.
+	// Draw must NOT call screen.Show() — the engine owns flushing.
 	Draw(screen tcell.Screen)
 
+	// Resize is called when the terminal dimensions change mid-life.
 	Resize(w, h int)
 }
 
-// All returns fresh instances of every scene, configured with the optional
-// SceneConfig. If no config is provided, compiled-in defaults are used.
-func All(cfgs ...config.SceneConfig) []Scene {
-	cfg := config.Default().Scene
-	if len(cfgs) > 0 {
-		cfg = cfgs[0]
-	}
+// All returns one fresh instance of every built-in scene.
+func All() []Scene {
 	return []Scene{
-		NewConstellation(cfg.Constellation),
-		NewRain(cfg.Rain),
-		NewParticles(cfg.Particles),
-		NewWaveform(cfg.Waveform),
-		NewPipes(cfg.Pipes),
-		NewMaze(cfg.Maze),
+		NewConstellation(),
+		NewRain(),
+		NewParticles(),
+		NewWaveform(),
+		NewCherries(),
 	}
 }
 
-func ByName(name string, cfgs ...config.SceneConfig) Scene {
-	for _, s := range All(cfgs...) {
+// ByName returns the scene with the given name, or nil.
+func ByName(name string) Scene {
+	for _, s := range All() {
 		if s.Name() == name {
 			return s
 		}
@@ -52,6 +49,7 @@ func ByName(name string, cfgs ...config.SceneConfig) Scene {
 	return nil
 }
 
+// Names returns the names of all available scenes.
 func Names() []string {
 	all := All()
 	names := make([]string, len(all))
@@ -61,17 +59,21 @@ func Names() []string {
 	return names
 }
 
+// ----------------------------------------------------------------------------
+// Color helpers
+// ----------------------------------------------------------------------------
+
 // RGBColor is a 24-bit true-color value.
 type RGBColor struct{ R, G, B uint8 }
 
-// Tcell converts to tcell.Color, degrading automatically on terminals that
-// don't support true color.
+// Tcell converts to tcell.Color (true-color if supported, otherwise degraded
+// automatically by tcell).
 func (c RGBColor) Tcell() tcell.Color {
 	return tcell.NewRGBColor(int32(c.R), int32(c.G), int32(c.B))
 }
 
 // Style returns a tcell.Style with this color as foreground and the
-// terminal's default background (never hardcodes a background color).
+// terminal's default background.
 func (c RGBColor) Style() tcell.Style {
 	return tcell.StyleDefault.Foreground(c.Tcell())
 }
@@ -91,18 +93,24 @@ func Lerp(a, b RGBColor, t float64) RGBColor {
 	}
 }
 
+// ----------------------------------------------------------------------------
+// Theme
+// ----------------------------------------------------------------------------
+
 // Theme holds the color palette for a scene.
 type Theme struct {
-	Name string
-	// Palette is the main accent colors. Scenes index with Palette[i % len(Palette)].
+	Name    string
+	// Palette is an ordered slice of accent colors.
+	// Scenes use Palette[i % len(Palette)] to stay in-bounds.
 	Palette []RGBColor
-	// Dim mirrors Palette with darker variants for trails and depth.
-	// Always the same length as Palette.
-	Dim []RGBColor
-	// Bright is a near-white highlight for peaks and heads.
-	Bright RGBColor
+	// Dim mirrors Palette with darker / more muted variants for trails and
+	// depth effects.
+	Dim     []RGBColor
+	// Bright is used for highlights (star centers, raindrop heads, etc.).
+	Bright  RGBColor
 }
 
+// Themes is the registry of all built-in color themes.
 var Themes = map[string]Theme{
 	"cosmic": {
 		Name: "cosmic",
@@ -200,22 +208,6 @@ var Themes = map[string]Theme{
 		},
 		Bright: RGBColor{200, 240, 180},
 	},
-	"wildberries": {
-		Name: "wildberries",
-		Palette: []RGBColor{
-			{255,13,130},
-			{144,124,255},
-			{72,200,160},
-			{255,160,120},
-		},
-		Dim: []RGBColor{
-			{90,5,45},
-			{60,50,120},
-			{30,100,90},
-			{120,70,50},
-		},
-		Bright: RGBColor{0,253,181},
-     },
 	"mono": {
 		Name: "mono",
 		Palette: []RGBColor{
@@ -234,6 +226,7 @@ var Themes = map[string]Theme{
 	},
 }
 
+// ThemeNames returns the names of all built-in themes.
 func ThemeNames() []string {
 	names := make([]string, 0, len(Themes))
 	for k := range Themes {
@@ -241,6 +234,10 @@ func ThemeNames() []string {
 	}
 	return names
 }
+
+// ----------------------------------------------------------------------------
+// Small math helpers shared across scene files
+// ----------------------------------------------------------------------------
 
 func absInt(x int) int {
 	if x < 0 {
@@ -258,3 +255,4 @@ func clamp64(v, lo, hi float64) float64 {
 	}
 	return v
 }
+

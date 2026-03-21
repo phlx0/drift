@@ -6,26 +6,25 @@ import (
 	"time"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/phlx0/drift/internal/config"
 )
 
+// particleGlyphs is the set of characters used to represent particles.
 var particleGlyphs = []rune{'◦', '·', '○', '•', '.', '°', '∘'}
 
+// Particles simulates a field of gently drifting particles driven by a
+// sinusoidal flow field.  Particles leave fading trails as they move.
 type Particles struct {
 	w, h      int
 	theme     Theme
 	particles []particle
 
 	// trail[x][y] brightness [0, 1].
-	trail    [][]float64
-	time     float64
-	rng      *rand.Rand
+	trail [][]float64
+	time  float64
+	rng   *rand.Rand
+
 	gravity  float64
 	friction float64
-
-	cfgCount    int
-	cfgGravity  float64
-	cfgFriction float64
 }
 
 type particle struct {
@@ -33,16 +32,11 @@ type particle struct {
 	vx, vy     float64
 	glyph      rune
 	paletteIdx int
-	phase      float64 // shimmer offset
+	phase      float64 // for individual shimmer
 }
 
-func NewParticles(cfg config.ParticlesConfig) *Particles {
-	return &Particles{
-		cfgCount:    cfg.Count,
-		cfgGravity:  cfg.Gravity,
-		cfgFriction: cfg.Friction,
-	}
-}
+// NewParticles returns a fresh Particles scene.
+func NewParticles() *Particles { return &Particles{gravity: 0, friction: 0.98} }
 
 func (p *Particles) Name() string { return "particles" }
 
@@ -50,12 +44,11 @@ func (p *Particles) Init(w, h int, t Theme) {
 	p.w, p.h = w, h
 	p.theme = t
 	p.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	p.gravity = p.cfgGravity
-	p.friction = p.cfgFriction
 
 	p.rebuildTrail()
 
-	p.particles = make([]particle, p.cfgCount)
+	count := 120
+	p.particles = make([]particle, count)
 	for i := range p.particles {
 		p.particles[i] = p.newParticle(true)
 	}
@@ -86,7 +79,7 @@ func (p *Particles) newParticle(scattered bool) particle {
 		x = p.rng.Float64() * float64(p.w)
 		y = p.rng.Float64() * float64(p.h)
 	} else {
-		// Spawn at a random edge so particles flow inward.
+		// Spawn at a random screen edge so particles flow inward.
 		switch p.rng.Intn(4) {
 		case 0:
 			x, y = p.rng.Float64()*float64(p.w), 0
@@ -109,8 +102,8 @@ func (p *Particles) newParticle(scattered bool) particle {
 	}
 }
 
-// flowField returns a velocity nudge using overlapping sinusoids —
-// cheap organic flow without external dependencies.
+// flowField returns a gentle velocity nudge at (x, y, t) using overlapping
+// sinusoids — a cheap but convincing organic flow without external deps.
 func flowField(x, y, t float64) (fx, fy float64) {
 	fx = math.Sin(x*0.04+t*0.25) * math.Cos(y*0.06+t*0.18) * 0.6
 	fy = math.Cos(x*0.06+t*0.20) * math.Sin(y*0.04+t*0.22) * 0.6
@@ -120,6 +113,7 @@ func flowField(x, y, t float64) (fx, fy float64) {
 func (p *Particles) Update(dt float64) {
 	p.time += dt
 
+	// Decay trail brightness.
 	decay := dt * 2.8
 	for x := range p.trail {
 		for y := range p.trail[x] {
@@ -134,15 +128,19 @@ func (p *Particles) Update(dt float64) {
 	for i := range p.particles {
 		pt := &p.particles[i]
 
+		// Apply flow field nudge.
 		fx, fy := flowField(pt.x, pt.y, p.time)
 		pt.vx += fx * dt
 		pt.vy += fy * dt
 
+		// Apply gravity (default 0).
 		pt.vy += p.gravity * dt
 
+		// Dampen velocity.
 		pt.vx *= math.Pow(p.friction, dt*60)
 		pt.vy *= math.Pow(p.friction, dt*60)
 
+		// Clamp speed.
 		speed := math.Sqrt(pt.vx*pt.vx + pt.vy*pt.vy)
 		maxSpeed := 3.0
 		if speed > maxSpeed {
@@ -154,6 +152,7 @@ func (p *Particles) Update(dt float64) {
 		pt.y += pt.vy * dt
 		pt.phase += dt * 1.2
 
+		// Stamp trail at current position.
 		ix, iy := int(pt.x+0.5), int(pt.y+0.5)
 		if ix >= 0 && ix < p.w && iy >= 0 && iy < p.h {
 			if p.trail[ix][iy] < 0.9 {
@@ -161,6 +160,7 @@ func (p *Particles) Update(dt float64) {
 			}
 		}
 
+		// Respawn particles that stray off-screen.
 		if pt.x < -2 || pt.x > float64(p.w)+2 ||
 			pt.y < -2 || pt.y > float64(p.h)+2 {
 			p.particles[i] = p.newParticle(false)
@@ -169,7 +169,7 @@ func (p *Particles) Update(dt float64) {
 }
 
 func (p *Particles) Draw(screen tcell.Screen) {
-	// Trails first so particles render on top.
+	// Render trails first so particles draw on top.
 	for x := 0; x < p.w; x++ {
 		for y := 0; y < p.h; y++ {
 			b := p.trail[x][y]
@@ -182,6 +182,7 @@ func (p *Particles) Draw(screen tcell.Screen) {
 		}
 	}
 
+	// Render particles.
 	for _, pt := range p.particles {
 		x, y := int(pt.x+0.5), int(pt.y+0.5)
 		if x < 0 || x >= p.w || y < 0 || y >= p.h {

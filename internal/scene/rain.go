@@ -5,15 +5,16 @@ import (
 	"time"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/phlx0/drift/internal/config"
 )
 
+// Rain renders columns of falling characters with bright heads and fading
+// trails, inspired by the classic matrix aesthetic.
 type Rain struct {
 	w, h  int
 	theme Theme
 
-	// grid[x][y] holds cell brightness [0, 1].
-	// 1.0 = freshly lit, 0.0 = dark.
+	// grid[x][y] holds the brightness of the cell [0, 1].
+	// 1.0 = freshly lit (raindrop just passed), 0.0 = dark.
 	grid  [][]float64
 	drops []rainDrop
 	time  float64
@@ -21,53 +22,33 @@ type Rain struct {
 
 	charset []rune
 	speed   float64
-
-	cfgCharset string
-	cfgDensity float64
-	cfgSpeed   float64
 }
 
 type rainDrop struct {
-	col        int
-	y          float64 // float for smooth sub-cell movement
-	speed      float64 // cells per second
-	headChar   rune
-	frameAge   int // frames since last char change
+	col       int
+	y         float64  // current head position (float for smooth movement)
+	speed     float64  // cells per second
+	headChar  rune
+	frameAge  int // frames since last char change
 	paletteIdx int
 }
 
-func NewRain(cfg config.RainConfig) *Rain {
-	return &Rain{
-		cfgCharset: cfg.Charset,
-		cfgDensity: cfg.Density,
-		cfgSpeed:   cfg.Speed,
-	}
-}
+// NewRain returns a fresh Rain scene.
+func NewRain() *Rain { return &Rain{} }
 
 func (r *Rain) Name() string { return "rain" }
-
-func (r *Rain) dropCount(w int) int {
-	if r.cfgDensity <= 0 {
-		return 5
-	}
-	// At default density 0.4: w/3 + 5, scales linearly with density.
-	return int(float64(w)*r.cfgDensity/1.2) + 5
-}
 
 func (r *Rain) Init(w, h int, t Theme) {
 	r.w, r.h = w, h
 	r.theme = t
 	r.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	if r.cfgCharset != "" {
-		r.charset = []rune(r.cfgCharset)
-	} else {
-		r.charset = []rune("ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789")
-	}
-	r.speed = r.cfgSpeed
+	r.charset = []rune("ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789")
+	r.speed = 1.0
 
 	r.rebuildGrid()
 
-	count := r.dropCount(w)
+	// Number of concurrent drops scales with terminal width.
+	count := w/3 + 5
 	r.drops = make([]rainDrop, count)
 	for i := range r.drops {
 		r.drops[i] = r.newDrop(true)
@@ -78,7 +59,7 @@ func (r *Rain) Resize(w, h int) {
 	r.w, r.h = w, h
 	r.rebuildGrid()
 
-	count := r.dropCount(w)
+	count := w/3 + 5
 	if len(r.drops) < count {
 		extra := make([]rainDrop, count-len(r.drops))
 		for i := range extra {
@@ -119,6 +100,7 @@ func (r *Rain) randomChar() rune {
 func (r *Rain) Update(dt float64) {
 	r.time += dt
 
+	// Decay all cells toward darkness.
 	decay := dt * 3.5
 	for x := range r.grid {
 		for y := range r.grid[x] {
@@ -143,6 +125,7 @@ func (r *Rain) Update(dt float64) {
 
 		d.y += d.speed * dt
 
+		// Illuminate trail behind the head.
 		headY := int(d.y)
 		for t := 0; t < trailLen; t++ {
 			cy := headY - t
@@ -154,12 +137,14 @@ func (r *Rain) Update(dt float64) {
 			}
 		}
 
+		// Randomise head character occasionally for flicker.
 		d.frameAge++
 		if d.frameAge >= 3+r.rng.Intn(4) {
 			d.headChar = r.randomChar()
 			d.frameAge = 0
 		}
 
+		// Reset drop when it fully exits the screen.
 		if d.y > float64(r.h+trailLen) {
 			r.drops[i] = r.newDrop(false)
 		}
@@ -170,6 +155,7 @@ func (r *Rain) Draw(screen tcell.Screen) {
 	pal := r.theme.Palette
 	dim := r.theme.Dim
 
+	// Render the brightness grid.
 	for x := 0; x < r.w; x++ {
 		for y := 0; y < r.h; y++ {
 			b := r.grid[x][y]
@@ -200,14 +186,15 @@ func (r *Rain) Draw(screen tcell.Screen) {
 		}
 	}
 
-	// Draw heads on top of the trail grid.
+	// Draw bright head characters on top.
 	for _, d := range r.drops {
 		if d.col < 0 || d.col >= r.w {
 			continue
 		}
 		hy := int(d.y)
 		if hy >= 0 && hy < r.h {
-			screen.SetContent(d.col, hy, d.headChar, nil, r.theme.Bright.Style())
+			color := r.theme.Bright
+			screen.SetContent(d.col, hy, d.headChar, nil, color.Style())
 		}
 	}
 }
