@@ -14,8 +14,7 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.6.0] — 2026-03-21
 
 ### Added
-- tmux status bar toggle feature. When enabled, drift will automatically hide the tmux status bar when a scene is active and restore it when exiting. This is configurable via `[engine]` section in `config.toml` with `hide_tmux_status = true|false` (default: false).
-
+- **tmux status toggle** — hides the tmux status bar while drift is active and restores it on exit; opt-in via `hide_tmux_status = true` in `[engine]`
 - **rosepine** theme — Rosé Pine colorscheme; palette uses Love, Iris, Foam, and Pine accents with the base background layers as dim variants
 - **automatic PR labeling** — labels applied automatically on PRs based on changed file paths and branch name prefix via `actions/labeler`
 - **platform and PRs Welcome badges** added to README
