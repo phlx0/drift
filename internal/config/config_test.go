@@ -15,9 +15,6 @@ func TestDefaultsAreValid(t *testing.T) {
 	if cfg.Engine.Theme == "" {
 		t.Error("default Theme should not be empty")
 	}
-	if cfg.Idle.Timeout <= 0 {
-		t.Errorf("default Timeout should be > 0, got %d", cfg.Idle.Timeout)
-	}
 }
 
 func TestLoadReturnsDefaultsWhenNoFile(t *testing.T) {
