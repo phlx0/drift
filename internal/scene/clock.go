@@ -38,7 +38,7 @@ const (
 )
 
 type Clock struct {
-	w, h int
+	w, h  int
 	theme Theme
 	cfg   config.ClockConfig
 }
