@@ -9,6 +9,13 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **AUR packaging** — `drift-bin` (pre-built binary) and `drift-git` (builds from HEAD) packages published to the Arch User Repository; install with `yay -S drift-bin` or `yay -S drift-git`
+- **AUR release automation** — GitHub Actions workflow (`.github/workflows/aur.yml`) automatically updates `drift-bin` PKGBUILD and `.SRCINFO` on every release, computing new checksums and pushing to AUR
+- **AUR badge** added to README
+- **AUR install option** added to README installation section
+
 ---
 
 ## [0.6.1] — 2026-03-22
