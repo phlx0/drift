@@ -1,8 +1,11 @@
 name: Update AUR
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag (e.g. v0.8.0)'
+        required: true
 
 jobs:
   update-aur:
@@ -26,7 +29,7 @@ jobs:
       - name: Compute checksums
         id: meta
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${{ inputs.tag_name }}"
           VERSION_NO_V="${VERSION#v}"
           AMD64=$(curl -sL "https://github.com/phlx0/drift/releases/download/${VERSION}/drift_linux_amd64.tar.gz" | sha256sum | cut -d' ' -f1)
           ARM64=$(curl -sL "https://github.com/phlx0/drift/releases/download/${VERSION}/drift_linux_arm64.tar.gz" | sha256sum | cut -d' ' -f1)
@@ -64,5 +67,5 @@ jobs:
           git config user.name "phlx0"
           git config user.email "phlx0@users.noreply.github.com"
           git add PKGBUILD .SRCINFO
-          git commit -m "update to ${{ github.event.release.tag_name }}"
+          git commit -m "update to ${{ inputs.tag_name }}"
           git push
