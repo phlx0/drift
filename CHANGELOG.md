@@ -11,6 +11,14 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.8.0] — 2026-03-27
+
+### Added
+
+- **showcase mode** — `drift --showcase` runs drift continuously without exiting on input; navigate scenes with `↑`/`↓` or `w`/`s`, cycle themes with `←`/`→` or `a`/`d`, press `esc` to quit. A two-row HUD overlay shows the current scene and theme name for 3 seconds after any navigation keypress, then fades out automatically.
+
+---
+
 ## [0.7.0] — 2026-03-26
 
 ### Added
@@ -180,6 +188,7 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.8.0]: https://github.com/phlx0/drift/releases/tag/v0.8.0
 [0.7.0]: https://github.com/phlx0/drift/releases/tag/v0.7.0
 [0.6.1]: https://github.com/phlx0/drift/releases/tag/v0.6.1
 [0.6.0]: https://github.com/phlx0/drift/releases/tag/v0.6.0

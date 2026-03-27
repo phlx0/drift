@@ -29,7 +29,7 @@ Every OS has a screensaver. The terminal had nothing — until now.
 
 ## Scenes
 
-drift ships seven animations. They cycle automatically or you can lock to one.
+drift ships eight animations. They cycle automatically or you can lock to one.
 
 <table>
 <tr>
@@ -202,6 +202,7 @@ drift                            start immediately (shell integration mode)
 drift --scene waveform           lock to a specific scene
 drift --theme catppuccin         override the color theme
 drift --duration 30              cycle scenes every 30 seconds
+drift --showcase                 browse all scenes and themes interactively
 
 drift list scenes                list all scenes
 drift list themes                list themes with color swatches
@@ -217,6 +218,7 @@ drift version                    print version info
 | `--theme`, `-t` | `cosmic` | color theme |
 | `--fps` | `30` | target frame rate |
 | `--duration` | `60` | seconds per scene, `0` = no cycling |
+| `--showcase` | `false` | interactive browser: `↑↓`/`ws` scene · `←→`/`ad` theme · `esc` quit |
 
 ---
 
