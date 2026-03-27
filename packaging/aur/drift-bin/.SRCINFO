@@ -1,6 +1,6 @@
 pkgbase = drift-bin
 	pkgdesc = Terminal screensaver and idle visualizer with animated scenes
-	pkgver = 0.7.0
+	pkgver = 0.8.0
 	pkgrel = 1
 	url = https://github.com/phlx0/drift
 	arch = x86_64
@@ -9,9 +9,9 @@ pkgbase = drift-bin
 	provides = drift
 	conflicts = drift
 	conflicts = drift-git
-	source_x86_64 = drift-bin-0.7.0-x86_64.tar.gz::https://github.com/phlx0/drift/releases/download/v0.7.0/drift_linux_amd64.tar.gz
-	sha256sums_x86_64 = 5bb6720280d66eb8818ddc16c816e71f2f99dc8d1068f6e64dce444cf7af8148
-	source_aarch64 = drift-bin-0.7.0-aarch64.tar.gz::https://github.com/phlx0/drift/releases/download/v0.7.0/drift_linux_arm64.tar.gz
-	sha256sums_aarch64 = 5cf9c47fd48ddc818a44747630c0c85d087cc7f0f71cc9c01b1b7f2b28d86284
+	source_x86_64 = drift-bin-0.8.0-x86_64.tar.gz::https://github.com/phlx0/drift/releases/download/v0.8.0/drift_linux_amd64.tar.gz
+	sha256sums_x86_64 = 37dff9b094edb11c103150ab3c989f313f60355cbd1b4f9cda57fe3864729282
+	source_aarch64 = drift-bin-0.8.0-aarch64.tar.gz::https://github.com/phlx0/drift/releases/download/v0.8.0/drift_linux_arm64.tar.gz
+	sha256sums_aarch64 = 220305557ef579da4a7cf89987a9e5549fe599f8a276fe23e60eff8fc260f265
 
 pkgname = drift-bin
