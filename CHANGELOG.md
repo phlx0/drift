@@ -11,6 +11,14 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.8.1] — 2026-03-27
+
+### Fixed
+
+- `drift version` now shows the correct version, commit, and date when installed via `go install` — previously always showed `dev / none / unknown` because the binary had no ldflags applied
+
+---
+
 ## [0.8.0] — 2026-03-27
 
 ### Added
@@ -188,6 +196,7 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.8.1]: https://github.com/phlx0/drift/releases/tag/v0.8.1
 [0.8.0]: https://github.com/phlx0/drift/releases/tag/v0.8.0
 [0.7.0]: https://github.com/phlx0/drift/releases/tag/v0.7.0
 [0.6.1]: https://github.com/phlx0/drift/releases/tag/v0.6.1
