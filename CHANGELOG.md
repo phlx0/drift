@@ -9,6 +9,10 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- `drift config` now clearly reports when the config file is missing (with a hint to run `drift config --init`) and when it fails to parse (previously both cases silently used defaults with no indication)
+
 ---
 
 ## [0.8.1] — 2026-03-27
