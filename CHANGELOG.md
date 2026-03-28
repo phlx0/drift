@@ -12,6 +12,7 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - **orrery** scene — a stylized solar system with a fixed sun, eight planets, and concentric orbit rings; configurable via `[scene.orrery]`: `bodies`, `trail_decay`
+- **showcase quit keys** — `q` and `ctrl+c` now exit showcase mode in addition to `esc`, fixing terminals (e.g. Ghostty) that intercept the escape key (closes #34)
 
 ---
 

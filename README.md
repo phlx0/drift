@@ -311,7 +311,7 @@ show_date = true  # show date below the time
 | `↓` / `s` | next scene |
 | `←` / `a` | previous theme |
 | `→` / `d` | next theme |
-| `esc` | quit |
+| `esc` / `q` / `ctrl+c` | quit |
 
 A status bar shows the current scene and theme for 3 seconds after each keypress, then fades out.
 

@@ -181,7 +181,7 @@ func (e *Engine) handleShowcaseEvent(ev tcell.Event, screen tcell.Screen, w, h *
 	switch ev := ev.(type) {
 	case *tcell.EventKey:
 		switch ev.Key() {
-		case tcell.KeyEscape:
+		case tcell.KeyEscape, tcell.KeyCtrlC:
 			return true
 		case tcell.KeyUp:
 			e.prevScene(*w, *h)
@@ -197,6 +197,8 @@ func (e *Engine) handleShowcaseEvent(ev tcell.Event, screen tcell.Screen, w, h *
 			e.hudTimer = 3.0
 		default:
 			switch ev.Rune() {
+			case 'q', 'Q':
+				return true
 			case 'w', 'W':
 				e.prevScene(*w, *h)
 				e.hudTimer = 3.0
@@ -250,7 +252,7 @@ func (e *Engine) drawHUD(screen tcell.Screen, w, h int) {
 		return
 	}
 
-	hint := "  \u2191\u2193/ws scene   \u2190\u2192/ad theme   esc quit  "
+	hint := "  \u2191\u2193/ws scene   \u2190\u2192/ad theme   esc/q quit  "
 	status := fmt.Sprintf("  scene: %-14s \u00b7  theme: %s",
 		e.scenes[e.cur].Name(), e.themeNames[e.themeIdx])
 
