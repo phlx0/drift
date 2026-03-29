@@ -7,6 +7,10 @@ import (
 	"github.com/phlx0/drift/internal/config"
 )
 
+// waveformAmplitudeScale converts configured amplitude to pixel height.
+// At the default amplitude of 0.70 this yields ~22% of pixel height.
+const waveformAmplitudeScale = 0.31
+
 // brailleOffsets maps (row, col) inside a braille cell to its Unicode bit offset.
 //
 // Unicode braille bit layout (U+2800 base):
@@ -74,7 +78,7 @@ func (wf *Waveform) Init(w, h int, t Theme) {
 // Called from Init and Resize so both paths stay in sync.
 func (wf *Waveform) buildLayers() {
 	// amplitude * 0.31 gives ~22% of pixel height at the default value of 0.70.
-	baseAmp := float64(wf.ph) * wf.cfgAmplitude * 0.31
+	baseAmp := float64(wf.ph) * wf.cfgAmplitude * waveformAmplitudeScale
 
 	numLayers := wf.cfgLayers
 	if numLayers < 1 {

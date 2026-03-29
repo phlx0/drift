@@ -18,6 +18,11 @@ const (
 
 	orrerySunExclusionRadius = 8.4
 	orreryAsteroidClearance  = 0.15
+
+	// Hash multipliers for the deterministic RNG seed.
+	orreryRNGSeedMulW int64 = 91841
+	orreryRNGSeedMulH int64 = 69457
+	orreryRNGSeedBase int64 = 0x77a31
 )
 
 type Orrery struct {
@@ -97,7 +102,7 @@ func (o *Orrery) Init(w, h int, t Theme) {
 	o.pw, o.ph = w*2, h*4
 	o.theme = t
 	o.time = 0
-	o.rng = rand.New(rand.NewSource(int64(w)*91841 ^ int64(h)*69457 ^ 0x77a31))
+	o.rng = rand.New(rand.NewSource(int64(w)*orreryRNGSeedMulW ^ int64(h)*orreryRNGSeedMulH ^ orreryRNGSeedBase))
 	o.centerX = float64(max(o.pw-1, 0)) / 2
 	o.centerY = float64(max(o.ph-1, 0)) / 2
 	o.allocBuffers()
@@ -114,7 +119,7 @@ func (o *Orrery) Resize(w, h int) {
 
 	o.w, o.h = w, h
 	o.pw, o.ph = w*2, h*4
-	o.rng = rand.New(rand.NewSource(int64(w)*91841 ^ int64(h)*69457 ^ 0x77a31))
+	o.rng = rand.New(rand.NewSource(int64(w)*orreryRNGSeedMulW ^ int64(h)*orreryRNGSeedMulH ^ orreryRNGSeedBase))
 	o.centerX = float64(max(o.pw-1, 0)) / 2
 	o.centerY = float64(max(o.ph-1, 0)) / 2
 	o.allocBuffers()

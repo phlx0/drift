@@ -9,6 +9,8 @@ import (
 	"github.com/phlx0/drift/internal/config"
 )
 
+const particleTrailDecayRate = 2.8 // brightness units per second
+
 var particleGlyphs = []rune{'◦', '·', '○', '•', '.', '°', '∘'}
 
 type Particles struct {
@@ -120,7 +122,7 @@ func flowField(x, y, t float64) (fx, fy float64) {
 func (p *Particles) Update(dt float64) {
 	p.time += dt
 
-	decay := dt * 2.8
+	decay := dt * particleTrailDecayRate
 	for x := range p.trail {
 		for y := range p.trail[x] {
 			if v := p.trail[x][y] - decay; v > 0 {

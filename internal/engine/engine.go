@@ -15,6 +15,10 @@ import (
 	"github.com/phlx0/drift/internal/scene"
 )
 
+// maxDeltaTime caps the per-frame time step to prevent large jumps
+// after sleep/wake or scheduler stalls.
+const maxDeltaTime = 0.1
+
 // shiftScreen wraps tcell.Screen and translates every SetContent call by
 // (ox, oy), discarding writes that land outside the physical screen bounds.
 // All other Screen methods delegate to the underlying screen unchanged.
@@ -285,9 +289,8 @@ func (e *Engine) drawHUD(screen tcell.Screen, w, h int) {
 
 // handleTick advances the simulation by dt seconds and redraws the screen.
 func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
-	// Cap dt to prevent large jumps after sleep/wake.
-	if dt > 0.1 {
-		dt = 0.1
+	if dt > maxDeltaTime {
+		dt = maxDeltaTime
 	}
 
 	// Advance OLED pixel shift: nudge by 1 cell every 10 seconds,
