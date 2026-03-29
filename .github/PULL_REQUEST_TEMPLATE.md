@@ -20,7 +20,9 @@
 - [ ] `go vet ./...` passes
 
 **For new scenes:**
-- [ ] Implements the full `Scene` interface (`Name`, `Init`, `Update`, `Draw`, `Resize`)
+- [ ] Scene lives in `internal/scene/myscene/` as `package myscene` with a `New(cfg)` constructor
+- [ ] Registered in `internal/scenes/scenes.go`
+- [ ] Implements the full `scene.Scene` interface (`Name`, `Init`, `Update`, `Draw`, `Resize`)
 - [ ] Uses `dt` for all time-based motion — no frame-counting
 - [ ] Respects the theme — uses `t.Palette`, `t.Dim`, `t.Bright`; no hardcoded colors
 - [ ] Never calls `screen.Show()` inside `Draw`

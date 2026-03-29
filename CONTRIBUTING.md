@@ -47,23 +47,28 @@ The only external runtime dependency is `tcell/v2` — no C library required.
 
 ```
 drift/
-├── main.go                    Entry point, ldflags injection
+├── main.go                         Entry point, ldflags injection
 ├── cmd/drift/
-│   ├── root.go                CLI commands (cobra)
-│   └── shell_snippets.go      Shell integration strings
+│   ├── root.go                     CLI commands (cobra)
+│   └── shell_snippets.go           Shell integration strings
 ├── internal/
-│   ├── config/config.go       TOML config loading
-│   ├── engine/engine.go       Render loop, scene lifecycle
-│   └── scene/
-│       ├── scene.go           Scene interface, Theme type, helpers
-│       ├── constellation.go   Drifting stars with connection lines
-│       ├── rain.go            Falling character rain
-│       ├── particles.go       Flow-field particle system
-│       ├── waveform.go        Braille sine wave layers
-│       ├── pipes.go           Box-drawing pipes
-│       ├── maze.go            Recursive backtracker maze
-│       └── life.go            Conway's Game of Life
-└── .github/workflows/         CI and release automation
+│   ├── config/config.go            TOML config loading
+│   ├── engine/engine.go            Render loop, scene lifecycle
+│   ├── scene/
+│   │   ├── scene.go                Scene interface, Theme, shared types and helpers
+│   │   ├── constellation/          Drifting stars with connection lines
+│   │   ├── rain/                   Falling character rain
+│   │   ├── particles/              Flow-field particle system
+│   │   ├── waveform/               Braille sine wave layers
+│   │   ├── pipes/                  Box-drawing pipes
+│   │   ├── maze/                   Recursive backtracker maze
+│   │   ├── life/                   Conway's Game of Life
+│   │   ├── clock/                  Braille large-digit clock
+│   │   ├── starfield/              3-D star warp
+│   │   └── orrery/                 Solar system (split across orrery.go, bodies.go, effects.go, render.go)
+│   └── scenes/
+│       └── scenes.go               Scene registry — All(), ByName(), Names()
+└── .github/workflows/              CI and release automation
 ```
 
 ---
@@ -128,30 +133,33 @@ Branch off `main`. Do not commit directly to `main`.
 
 ## Adding a new scene
 
-1. Create `internal/scene/myscene.go` with `package scene`.
+1. Create a directory `internal/scene/myscene/` and add `myscene.go` with `package myscene`.
 
-2. Implement the `Scene` interface:
+2. Implement the `scene.Scene` interface:
 
    ```go
-   type Scene interface {
-       Name()   string
-       Init(w, h int, t Theme)
-       Update(dt float64)
-       Draw(screen tcell.Screen)
-       Resize(w, h int)
-   }
+   import "github.com/phlx0/drift/internal/scene"
+
+   type MyScene struct { ... }
+
+   func New(cfg config.MySceneConfig) *MyScene { ... }
+
+   func (s *MyScene) Name() string                      { return "myscene" }
+   func (s *MyScene) Init(w, h int, t scene.Theme)      { ... }
+   func (s *MyScene) Update(dt float64)                 { ... }
+   func (s *MyScene) Draw(screen tcell.Screen)          { ... }
+   func (s *MyScene) Resize(w, h int)                   { ... }
    ```
 
-3. Register it in `All()` inside `internal/scene/scene.go`:
+3. Register it in `All()` inside `internal/scenes/scenes.go`:
 
    ```go
-   func All() []Scene {
-       return []Scene{
-           NewConstellation(),
-           NewRain(),
-           NewParticles(),
-           NewWaveform(),
-           NewMyScene(), // add here
+   import "github.com/phlx0/drift/internal/scene/myscene"
+
+   func All(cfg config.SceneConfig) []scene.Scene {
+       return []scene.Scene{
+           // existing scenes ...
+           myscene.New(cfg.MyScene),
        }
    }
    ```
