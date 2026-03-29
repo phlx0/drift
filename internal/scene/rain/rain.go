@@ -1,4 +1,4 @@
-package scene
+package rain
 
 import (
 	"math/rand"
@@ -6,11 +6,12 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 type Rain struct {
 	w, h  int
-	theme Theme
+	theme scene.Theme
 
 	// grid[x][y] holds cell brightness [0, 1].
 	// 1.0 = freshly lit, 0.0 = dark.
@@ -36,7 +37,7 @@ type rainDrop struct {
 	paletteIdx int
 }
 
-func NewRain(cfg config.RainConfig) *Rain {
+func New(cfg config.RainConfig) *Rain {
 	return &Rain{
 		cfgCharset: cfg.Charset,
 		cfgDensity: cfg.Density,
@@ -54,7 +55,7 @@ func (r *Rain) dropCount(w int) int {
 	return int(float64(w)*r.cfgDensity/1.2) + 5
 }
 
-func (r *Rain) Init(w, h int, t Theme) {
+func (r *Rain) Init(w, h int, t scene.Theme) {
 	r.w, r.h = w, h
 	r.theme = t
 	r.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -178,22 +179,22 @@ func (r *Rain) Draw(screen tcell.Screen) {
 			}
 
 			var ch rune
-			var color RGBColor
+			var color scene.RGBColor
 			pIdx := x % len(pal)
 
 			switch {
 			case b > 0.85:
 				ch = '│'
-				color = Lerp(pal[pIdx], r.theme.Bright, (b-0.85)/0.15)
+				color = scene.Lerp(pal[pIdx], r.theme.Bright, (b-0.85)/0.15)
 			case b > 0.55:
 				ch = '╎'
 				color = pal[pIdx]
 			case b > 0.30:
 				ch = '╌'
-				color = Lerp(dim[pIdx%len(dim)], pal[pIdx], (b-0.30)/0.25)
+				color = scene.Lerp(dim[pIdx%len(dim)], pal[pIdx], (b-0.30)/0.25)
 			default:
 				ch = '·'
-				color = Lerp(dim[pIdx%len(dim)], pal[pIdx], b/0.30)
+				color = scene.Lerp(dim[pIdx%len(dim)], pal[pIdx], b/0.30)
 			}
 
 			screen.SetContent(x, y, ch, nil, color.Style())

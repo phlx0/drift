@@ -1,4 +1,4 @@
-package scene
+package starfield
 
 import (
 	"math"
@@ -7,13 +7,14 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 var sfGlyphs = []rune{'·', '∘', '*', '✦'}
 
 type Starfield struct {
 	w, h  int
-	theme Theme
+	theme scene.Theme
 	stars []sfStar
 	rng   *rand.Rand
 
@@ -30,7 +31,7 @@ type sfStar struct {
 	palIdx  int
 }
 
-func NewStarfield(cfg config.StarfieldConfig) *Starfield {
+func New(cfg config.StarfieldConfig) *Starfield {
 	return &Starfield{
 		cfgCount: cfg.Count,
 		cfgSpeed: cfg.Speed,
@@ -39,7 +40,7 @@ func NewStarfield(cfg config.StarfieldConfig) *Starfield {
 
 func (s *Starfield) Name() string { return "starfield" }
 
-func (s *Starfield) Init(w, h int, t Theme) {
+func (s *Starfield) Init(w, h int, t scene.Theme) {
 	s.w, s.h = w, h
 	s.theme = t
 	s.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -121,7 +122,7 @@ func (s *Starfield) Draw(screen tcell.Screen) {
 
 		if st.hasPrev && (st.prevPX != px || st.prevPY != py) {
 			if st.prevPX >= 0 && st.prevPX < s.w && st.prevPY >= 0 && st.prevPY < s.h {
-				trailColor := Lerp(dimColor, palColor, brightness*0.35)
+				trailColor := scene.Lerp(dimColor, palColor, brightness*0.35)
 				screen.SetContent(st.prevPX, st.prevPY, '·', nil, trailColor.Style())
 			}
 		}
@@ -131,11 +132,11 @@ func (s *Starfield) Draw(screen tcell.Screen) {
 			glyphIdx = len(sfGlyphs) - 1
 		}
 
-		var color RGBColor
+		var color scene.RGBColor
 		if brightness > 0.85 {
-			color = Lerp(palColor, s.theme.Bright, (brightness-0.85)/0.15)
+			color = scene.Lerp(palColor, s.theme.Bright, (brightness-0.85)/0.15)
 		} else {
-			color = Lerp(dimColor, palColor, brightness/0.85)
+			color = scene.Lerp(dimColor, palColor, brightness/0.85)
 		}
 
 		screen.SetContent(px, py, sfGlyphs[glyphIdx], nil, color.Style())

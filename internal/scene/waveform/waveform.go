@@ -1,27 +1,12 @@
-package scene
+package waveform
 
 import (
 	"math"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
-
-// brailleOffsets maps (row, col) inside a braille cell to its Unicode bit offset.
-//
-// Unicode braille bit layout (U+2800 base):
-//
-//	col 0   col 1
-//	bit 0   bit 3   ← row 0 (top)
-//	bit 1   bit 4   ← row 1
-//	bit 2   bit 5   ← row 2
-//	bit 6   bit 7   ← row 3 (bottom)
-var brailleOffsets = [4][2]uint{
-	{0, 3},
-	{1, 4},
-	{2, 5},
-	{6, 7},
-}
 
 // waveLayer is one sine wave in the stack.
 type waveLayer struct {
@@ -29,14 +14,14 @@ type waveLayer struct {
 	amp   float64 // amplitude in pixels (not characters)
 	speed float64 // radians per second (positive = rightward)
 	phase float64 // initial phase offset (radians)
-	color RGBColor
+	color scene.RGBColor
 }
 
 // Waveform renders multiple breathing sine waves using braille Unicode
 // characters for sub-character precision (2×4 dots per terminal cell).
 type Waveform struct {
 	w, h  int
-	theme Theme
+	theme scene.Theme
 
 	// Pixel resolution: pw = w*2, ph = h*4
 	pw, ph int
@@ -52,7 +37,7 @@ type Waveform struct {
 	cfgSpeed     float64
 }
 
-func NewWaveform(cfg config.WaveformConfig) *Waveform {
+func New(cfg config.WaveformConfig) *Waveform {
 	return &Waveform{
 		cfgLayers:    cfg.Layers,
 		cfgAmplitude: cfg.Amplitude,
@@ -62,7 +47,7 @@ func NewWaveform(cfg config.WaveformConfig) *Waveform {
 
 func (wf *Waveform) Name() string { return "waveform" }
 
-func (wf *Waveform) Init(w, h int, t Theme) {
+func (wf *Waveform) Init(w, h int, t scene.Theme) {
 	wf.w, wf.h = w, h
 	wf.theme = t
 	wf.pw, wf.ph = w*2, h*4
@@ -167,7 +152,7 @@ func (wf *Waveform) buildBrailleCell(cx, cy int) (rune, tcell.Style, bool) {
 			if waveIdx == 0 {
 				continue
 			}
-			bitOffset := brailleOffsets[subRow][subCol]
+			bitOffset := scene.BrailleOffsets[subRow][subCol]
 			mask |= uint8(1) << bitOffset
 			if int(waveIdx-1) < len(waveCounts) {
 				waveCounts[waveIdx-1]++
@@ -190,8 +175,8 @@ func (wf *Waveform) buildBrailleCell(cx, cy int) (rune, tcell.Style, bool) {
 	color := wf.layers[bestWave].color
 	totalBits := waveCounts[0] + waveCounts[1] + waveCounts[2]
 	if totalBits > 0 {
-		boost := clamp64(float64(totalBits)/8.0, 0, 1) * 0.35
-		color = Lerp(color, wf.theme.Bright, boost)
+		boost := scene.Clamp64(float64(totalBits)/8.0, 0, 1) * 0.35
+		color = scene.Lerp(color, wf.theme.Bright, boost)
 	}
 
 	return '\u2800' | rune(mask), color.Style(), true

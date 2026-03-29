@@ -4,7 +4,6 @@ package scene
 
 import (
 	"github.com/gdamore/tcell/v2"
-	"github.com/phlx0/drift/internal/config"
 )
 
 // Scene is the interface every drift animation must implement.
@@ -26,43 +25,20 @@ type Scene interface {
 	Resize(w, h int)
 }
 
-// All returns fresh instances of every scene, configured with the optional
-// SceneConfig. If no config is provided, compiled-in defaults are used.
-func All(cfgs ...config.SceneConfig) []Scene {
-	cfg := config.Default().Scene
-	if len(cfgs) > 0 {
-		cfg = cfgs[0]
-	}
-	return []Scene{
-		NewConstellation(cfg.Constellation),
-		NewRain(cfg.Rain),
-		NewParticles(cfg.Particles),
-		NewWaveform(cfg.Waveform),
-		NewOrrery(cfg.Orrery),
-		NewPipes(cfg.Pipes),
-		NewMaze(cfg.Maze),
-		NewLife(cfg.Life),
-		NewClock(cfg.Clock),
-		NewStarfield(cfg.Starfield),
-	}
-}
-
-func ByName(name string, cfgs ...config.SceneConfig) Scene {
-	for _, s := range All(cfgs...) {
-		if s.Name() == name {
-			return s
-		}
-	}
-	return nil
-}
-
-func Names() []string {
-	all := All()
-	names := make([]string, len(all))
-	for i, s := range all {
-		names[i] = s.Name()
-	}
-	return names
+// BrailleOffsets maps (row, col) inside a braille cell to its Unicode bit offset.
+//
+// Unicode braille bit layout (U+2800 base):
+//
+//	col 0   col 1
+//	bit 0   bit 3   ← row 0 (top)
+//	bit 1   bit 4   ← row 1
+//	bit 2   bit 5   ← row 2
+//	bit 6   bit 7   ← row 3 (bottom)
+var BrailleOffsets = [4][2]uint{
+	{0, 3},
+	{1, 4},
+	{2, 5},
+	{6, 7},
 }
 
 // RGBColor is a 24-bit true-color value.
@@ -262,14 +238,14 @@ func ThemeNames() []string {
 	return names
 }
 
-func absInt(x int) int {
+func AbsInt(x int) int {
 	if x < 0 {
 		return -x
 	}
 	return x
 }
 
-func clamp64(v, lo, hi float64) float64 {
+func Clamp64(v, lo, hi float64) float64 {
 	if v < lo {
 		return lo
 	}

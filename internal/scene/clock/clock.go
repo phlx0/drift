@@ -1,10 +1,11 @@
-package scene
+package clock
 
 import (
 	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 // clockDigits holds 5×7 pixel bitmaps for digits 0–9.
@@ -39,17 +40,17 @@ const (
 
 type Clock struct {
 	w, h  int
-	theme Theme
+	theme scene.Theme
 	cfg   config.ClockConfig
 }
 
-func NewClock(cfg config.ClockConfig) *Clock {
+func New(cfg config.ClockConfig) *Clock {
 	return &Clock{cfg: cfg}
 }
 
 func (c *Clock) Name() string { return "clock" }
 
-func (c *Clock) Init(w, h int, t Theme) {
+func (c *Clock) Init(w, h int, t scene.Theme) {
 	c.w, c.h = w, h
 	c.theme = t
 }

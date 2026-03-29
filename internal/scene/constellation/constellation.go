@@ -1,4 +1,4 @@
-package scene
+package constellation
 
 import (
 	"math"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 // starGlyphs ordered from faintest to brightest.
@@ -15,7 +16,7 @@ var starGlyphs = []rune{'·', '∘', '○', '◦', '*', '✦'}
 
 type Constellation struct {
 	w, h  int
-	theme Theme
+	theme scene.Theme
 	stars []star
 	time  float64
 	rng   *rand.Rand
@@ -38,7 +39,7 @@ type star struct {
 	paletteIdx  int
 }
 
-func NewConstellation(cfg config.ConstellationConfig) *Constellation {
+func New(cfg config.ConstellationConfig) *Constellation {
 	return &Constellation{
 		cfgStarCount:      cfg.StarCount,
 		cfgConnectRadius:  cfg.ConnectRadius,
@@ -49,7 +50,7 @@ func NewConstellation(cfg config.ConstellationConfig) *Constellation {
 
 func (c *Constellation) Name() string { return "constellation" }
 
-func (c *Constellation) Init(w, h int, t Theme) {
+func (c *Constellation) Init(w, h int, t scene.Theme) {
 	c.w, c.h = w, h
 	c.theme = t
 	c.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -172,7 +173,7 @@ func (c *Constellation) Draw(screen tcell.Screen) {
 	for _, e := range edges {
 		a, b := &c.stars[e.i], &c.stars[e.j]
 		alpha := (1.0 - e.dist/c.connectDist) * 0.55
-		color := Lerp(c.theme.Dim[a.paletteIdx%len(c.theme.Dim)], c.theme.Palette[a.paletteIdx], alpha)
+		color := scene.Lerp(c.theme.Dim[a.paletteIdx%len(c.theme.Dim)], c.theme.Palette[a.paletteIdx], alpha)
 		c.drawDots(screen, int(a.x+0.5), int(a.y+0.5), int(b.x+0.5), int(b.y+0.5), color)
 	}
 
@@ -181,10 +182,10 @@ func (c *Constellation) Draw(screen tcell.Screen) {
 		brightness := 0.55 + 0.45*math.Sin(s.twinkle)
 		dim := c.theme.Dim[s.paletteIdx%len(c.theme.Dim)]
 		pal := c.theme.Palette[s.paletteIdx]
-		color := Lerp(dim, pal, brightness)
+		color := scene.Lerp(dim, pal, brightness)
 		if brightness > 0.9 {
 			// Flash toward Bright at peak twinkle.
-			color = Lerp(pal, c.theme.Bright, (brightness-0.9)*10)
+			color = scene.Lerp(pal, c.theme.Bright, (brightness-0.9)*10)
 		}
 		x, y := int(s.x+0.5), int(s.y+0.5)
 		if x >= 0 && x < c.w && y >= 0 && y < c.h {
@@ -195,11 +196,11 @@ func (c *Constellation) Draw(screen tcell.Screen) {
 
 // drawDots places '·' along the line from (x0,y0) to (x1,y1).
 // Endpoints are skipped so stars always render on top.
-func (c *Constellation) drawDots(screen tcell.Screen, x0, y0, x1, y1 int, color RGBColor) {
+func (c *Constellation) drawDots(screen tcell.Screen, x0, y0, x1, y1 int, color scene.RGBColor) {
 	dx := x1 - x0
 	dy := y1 - y0
-	steps := absInt(dx)
-	if d := absInt(dy); d > steps {
+	steps := scene.AbsInt(dx)
+	if d := scene.AbsInt(dy); d > steps {
 		steps = d
 	}
 	if steps < 2 {

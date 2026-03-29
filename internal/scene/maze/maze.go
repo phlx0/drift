@@ -1,4 +1,4 @@
-package scene
+package maze
 
 import (
 	"math/rand"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 var mazeDirs = [4][2]int{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
@@ -23,7 +24,7 @@ type mazePos struct{ x, y int }
 type Maze struct {
 	w, h   int
 	mw, mh int
-	theme  Theme
+	theme  scene.Theme
 	rng    *rand.Rand
 
 	walls   [][]bool
@@ -42,7 +43,7 @@ type Maze struct {
 	cfgSpeed        float64
 }
 
-func NewMaze(cfg config.MazeConfig) *Maze {
+func New(cfg config.MazeConfig) *Maze {
 	return &Maze{
 		cfgPauseSeconds: cfg.PauseSeconds,
 		cfgFadeSeconds:  cfg.FadeSeconds,
@@ -52,7 +53,7 @@ func NewMaze(cfg config.MazeConfig) *Maze {
 
 func (m *Maze) Name() string { return "maze" }
 
-func (m *Maze) Init(w, h int, t Theme) {
+func (m *Maze) Init(w, h int, t scene.Theme) {
 	m.w, m.h = w, h
 	m.theme = t
 	m.rng = rand.New(rand.NewSource(time.Now().UnixNano()))

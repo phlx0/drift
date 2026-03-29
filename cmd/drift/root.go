@@ -10,6 +10,7 @@ import (
 	"github.com/phlx0/drift/internal/config"
 	"github.com/phlx0/drift/internal/engine"
 	"github.com/phlx0/drift/internal/scene"
+	"github.com/phlx0/drift/internal/scenes"
 	"github.com/spf13/cobra"
 )
 
@@ -142,7 +143,7 @@ var listCmd = &cobra.Command{
 		switch args[0] {
 		case "scenes":
 			fmt.Println("Available scenes:")
-			for _, name := range scene.Names() {
+			for _, name := range scenes.Names() {
 				fmt.Printf("  %s\n", name)
 			}
 		case "themes":

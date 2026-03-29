@@ -1,4 +1,4 @@
-package scene
+package pipes
 
 import (
 	"math/rand"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 const (
@@ -36,7 +37,7 @@ var (
 
 type pipeCell struct {
 	ch    rune
-	color RGBColor
+	color scene.RGBColor
 }
 
 type pipeHead struct {
@@ -49,7 +50,7 @@ type pipeHead struct {
 
 type Pipes struct {
 	w, h       int
-	theme      Theme
+	theme      scene.Theme
 	rng        *rand.Rand
 	heads      []pipeHead
 	grid       [][]pipeCell
@@ -61,7 +62,7 @@ type Pipes struct {
 	cfgResetSeconds float64
 }
 
-func NewPipes(cfg config.PipesConfig) *Pipes {
+func New(cfg config.PipesConfig) *Pipes {
 	return &Pipes{
 		cfgHeads:        cfg.Heads,
 		cfgTurnChance:   cfg.TurnChance,
@@ -72,7 +73,7 @@ func NewPipes(cfg config.PipesConfig) *Pipes {
 
 func (p *Pipes) Name() string { return "pipes" }
 
-func (p *Pipes) Init(w, h int, t Theme) {
+func (p *Pipes) Init(w, h int, t scene.Theme) {
 	p.w, p.h = w, h
 	p.theme = t
 	p.rng = rand.New(rand.NewSource(time.Now().UnixNano()))

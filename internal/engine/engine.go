@@ -13,6 +13,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
 	"github.com/phlx0/drift/internal/scene"
+	"github.com/phlx0/drift/internal/scenes"
 )
 
 // shiftScreen wraps tcell.Screen and translates every SetContent call by
@@ -87,7 +88,7 @@ func (e *Engine) Run() error {
 	e.theme = t
 
 	if e.cfg.Engine.Showcase {
-		e.scenes = scene.All(e.cfg.Scene)
+		e.scenes = scenes.All(e.cfg.Scene)
 		names := scene.ThemeNames()
 		sort.Strings(names)
 		e.themeNames = names
@@ -332,18 +333,18 @@ func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 func (e *Engine) buildScenes() []scene.Scene {
 	spec := strings.TrimSpace(e.cfg.Engine.Scenes)
 	if spec == "" || spec == "all" {
-		return scene.All(e.cfg.Scene)
+		return scenes.All(e.cfg.Scene)
 	}
 
 	var result []scene.Scene
 	for _, name := range strings.Split(spec, ",") {
 		name = strings.TrimSpace(name)
-		if s := scene.ByName(name, e.cfg.Scene); s != nil {
+		if s := scenes.ByName(name, e.cfg.Scene); s != nil {
 			result = append(result, s)
 		}
 	}
 	if len(result) == 0 {
-		return scene.All(e.cfg.Scene)
+		return scenes.All(e.cfg.Scene)
 	}
 	return result
 }

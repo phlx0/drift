@@ -1,4 +1,4 @@
-package scene
+package particles
 
 import (
 	"math"
@@ -7,13 +7,14 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 var particleGlyphs = []rune{'◦', '·', '○', '•', '.', '°', '∘'}
 
 type Particles struct {
 	w, h      int
-	theme     Theme
+	theme     scene.Theme
 	particles []particle
 
 	// trail[x][y] brightness [0, 1].
@@ -36,7 +37,7 @@ type particle struct {
 	phase      float64 // shimmer offset
 }
 
-func NewParticles(cfg config.ParticlesConfig) *Particles {
+func New(cfg config.ParticlesConfig) *Particles {
 	return &Particles{
 		cfgCount:    cfg.Count,
 		cfgGravity:  cfg.Gravity,
@@ -46,7 +47,7 @@ func NewParticles(cfg config.ParticlesConfig) *Particles {
 
 func (p *Particles) Name() string { return "particles" }
 
-func (p *Particles) Init(w, h int, t Theme) {
+func (p *Particles) Init(w, h int, t scene.Theme) {
 	p.w, p.h = w, h
 	p.theme = t
 	p.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -177,7 +178,7 @@ func (p *Particles) Draw(screen tcell.Screen) {
 				continue
 			}
 			pIdx := (x + y) % len(p.theme.Dim)
-			color := Lerp(p.theme.Dim[pIdx], p.theme.Palette[pIdx], b*0.45)
+			color := scene.Lerp(p.theme.Dim[pIdx], p.theme.Palette[pIdx], b*0.45)
 			screen.SetContent(x, y, '·', nil, color.Style())
 		}
 	}
@@ -189,7 +190,7 @@ func (p *Particles) Draw(screen tcell.Screen) {
 		}
 		shimmer := 0.65 + 0.35*math.Sin(pt.phase)
 		pIdx := pt.paletteIdx
-		color := Lerp(p.theme.Palette[pIdx], p.theme.Bright, shimmer*0.5)
+		color := scene.Lerp(p.theme.Palette[pIdx], p.theme.Bright, shimmer*0.5)
 		screen.SetContent(x, y, pt.glyph, nil, color.Style())
 	}
 }

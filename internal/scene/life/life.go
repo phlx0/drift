@@ -1,4 +1,4 @@
-package scene
+package life
 
 import (
 	"math/rand"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/phlx0/drift/internal/config"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 // Life implements Conway's Game of Life as a drift scene.
@@ -15,7 +16,7 @@ import (
 // and a stagnation guard resets early if the grid freezes for 3 seconds.
 type Life struct {
 	w, h  int
-	theme Theme
+	theme scene.Theme
 	rng   *rand.Rand
 
 	cells [][]bool
@@ -32,7 +33,7 @@ type Life struct {
 	cfgResetSeconds float64
 }
 
-func NewLife(cfg config.LifeConfig) *Life {
+func New(cfg config.LifeConfig) *Life {
 	return &Life{
 		cfgDensity:      cfg.Density,
 		cfgSpeed:        cfg.Speed,
@@ -42,7 +43,7 @@ func NewLife(cfg config.LifeConfig) *Life {
 
 func (l *Life) Name() string { return "life" }
 
-func (l *Life) Init(w, h int, t Theme) {
+func (l *Life) Init(w, h int, t scene.Theme) {
 	l.w, l.h = w, h
 	l.theme = t
 	l.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
