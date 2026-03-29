@@ -9,6 +9,10 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [0.10.0] — 2026-03-29
+
 ### Added
 
 - **starfield** scene — classic 3-D star warp; stars spawn near the centre, accelerate toward the viewer and fan out to the edges; close stars flash bright and leave a one-cell trail; configurable via `[scene.starfield]`: `count`, `speed`
@@ -222,6 +226,7 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.10.0]: https://github.com/phlx0/drift/releases/tag/v0.10.0
 [0.9.0]: https://github.com/phlx0/drift/releases/tag/v0.9.0
 [0.8.2]: https://github.com/phlx0/drift/releases/tag/v0.8.2
 [0.8.1]: https://github.com/phlx0/drift/releases/tag/v0.8.1
