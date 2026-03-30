@@ -9,6 +9,10 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **shell snippet tests** — unit tests covering `shellSnippet()` for all supported shells and unsupported-shell error paths
+
 ### Fixed
 
 - **orrery** scene — terminal resize no longer resets the RNG to the same seed used at init, preventing repetitive asteroid and UFO spawn patterns after resize events
