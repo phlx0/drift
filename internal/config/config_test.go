@@ -93,3 +93,73 @@ func TestPathExpandsTildeInXDGConfigHome(t *testing.T) {
 		t.Errorf("unexpected path: %s (want %s)", p, want)
 	}
 }
+
+func TestValidateAcceptsDefaults(t *testing.T) {
+	cfg := Default()
+	if err := cfg.Validate(); err != nil {
+		t.Errorf("Validate() should accept defaults, got: %v", err)
+	}
+}
+
+func TestValidateRejectsOutOfRangeValues(t *testing.T) {
+	tests := []struct {
+		name   string
+		modify func(*Config)
+	}{
+		// engine
+		{"negative fps", func(c *Config) { c.Engine.FPS = -1 }},
+		{"excessive fps", func(c *Config) { c.Engine.FPS = 200 }},
+		{"negative cycle_seconds", func(c *Config) { c.Engine.CycleSeconds = -5 }},
+
+		// constellation
+		{"star_count < 1", func(c *Config) { c.Scene.Constellation.StarCount = 0 }},
+		{"connect_radius > 1", func(c *Config) { c.Scene.Constellation.ConnectRadius = 1.5 }},
+		{"max_connections < 1", func(c *Config) { c.Scene.Constellation.MaxConnections = 0 }},
+
+		// rain
+		{"rain density > 1", func(c *Config) { c.Scene.Rain.Density = 1.5 }},
+		{"rain speed <= 0", func(c *Config) { c.Scene.Rain.Speed = 0 }},
+
+		// particles
+		{"particles count < 1", func(c *Config) { c.Scene.Particles.Count = 0 }},
+
+		// waveform
+		{"waveform amplitude > 1", func(c *Config) { c.Scene.Waveform.Amplitude = 2.0 }},
+		{"waveform speed <= 0", func(c *Config) { c.Scene.Waveform.Speed = -1 }},
+
+		// orrery
+		{"orrery bodies < 4", func(c *Config) { c.Scene.Orrery.Bodies = 2 }},
+		{"orrery bodies > 8", func(c *Config) { c.Scene.Orrery.Bodies = 12 }},
+		{"orrery trail_decay <= 0", func(c *Config) { c.Scene.Orrery.TrailDecay = 0 }},
+
+		// pipes
+		{"pipes heads < 1", func(c *Config) { c.Scene.Pipes.Heads = 0 }},
+		{"pipes turn_chance > 1", func(c *Config) { c.Scene.Pipes.TurnChance = 1.5 }},
+		{"pipes speed <= 0", func(c *Config) { c.Scene.Pipes.Speed = 0 }},
+		{"pipes reset_seconds <= 0", func(c *Config) { c.Scene.Pipes.ResetSeconds = -1 }},
+
+		// maze
+		{"maze pause_seconds < 0", func(c *Config) { c.Scene.Maze.PauseSeconds = -1 }},
+		{"maze fade_seconds < 0", func(c *Config) { c.Scene.Maze.FadeSeconds = -1 }},
+		{"maze speed <= 0", func(c *Config) { c.Scene.Maze.Speed = 0 }},
+
+		// life
+		{"life density < 0", func(c *Config) { c.Scene.Life.Density = -0.1 }},
+		{"life speed <= 0", func(c *Config) { c.Scene.Life.Speed = 0 }},
+		{"life reset_seconds <= 0", func(c *Config) { c.Scene.Life.ResetSeconds = -1 }},
+
+		// starfield
+		{"starfield count < 1", func(c *Config) { c.Scene.Starfield.Count = 0 }},
+		{"starfield speed <= 0", func(c *Config) { c.Scene.Starfield.Speed = 0 }},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := Default()
+			tt.modify(cfg)
+			if err := cfg.Validate(); err == nil {
+				t.Errorf("Validate() should return error for %s", tt.name)
+			}
+		})
+	}
+}

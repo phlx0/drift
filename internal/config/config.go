@@ -4,6 +4,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -182,7 +183,116 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
+	if err := cfg.Validate(); err != nil {
+		return nil, err
+	}
+
 	return cfg, nil
+}
+
+// Validate checks config values for out-of-range settings and returns
+// a human-readable error if any are found. All numeric fields with
+// meaningful bounds are covered; boolean and free-form string fields
+// are intentionally excluded.
+func (c *Config) Validate() error {
+	var errs []string
+
+	// engine
+	if c.Engine.FPS < 1 || c.Engine.FPS > 120 {
+		errs = append(errs, fmt.Sprintf("engine.fps must be between 1 and 120, got %d", c.Engine.FPS))
+	}
+	if c.Engine.CycleSeconds < 0 {
+		errs = append(errs, fmt.Sprintf("engine.cycle_seconds must be >= 0, got %.1f", c.Engine.CycleSeconds))
+	}
+
+	// constellation
+	if n := c.Scene.Constellation.StarCount; n < 1 {
+		errs = append(errs, fmt.Sprintf("scene.constellation.star_count must be >= 1, got %d", n))
+	}
+	if r := c.Scene.Constellation.ConnectRadius; r < 0 || r > 1 {
+		errs = append(errs, fmt.Sprintf("scene.constellation.connect_radius must be between 0.0 and 1.0, got %.2f", r))
+	}
+	if n := c.Scene.Constellation.MaxConnections; n < 1 {
+		errs = append(errs, fmt.Sprintf("scene.constellation.max_connections must be >= 1, got %d", n))
+	}
+
+	// rain
+	if d := c.Scene.Rain.Density; d < 0 || d > 1 {
+		errs = append(errs, fmt.Sprintf("scene.rain.density must be between 0.0 and 1.0, got %.2f", d))
+	}
+	if s := c.Scene.Rain.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.rain.speed must be > 0, got %.2f", s))
+	}
+
+	// particles
+	if n := c.Scene.Particles.Count; n < 1 {
+		errs = append(errs, fmt.Sprintf("scene.particles.count must be >= 1, got %d", n))
+	}
+
+	// waveform
+	if a := c.Scene.Waveform.Amplitude; a < 0 || a > 1 {
+		errs = append(errs, fmt.Sprintf("scene.waveform.amplitude must be between 0.0 and 1.0, got %.2f", a))
+	}
+	if s := c.Scene.Waveform.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.waveform.speed must be > 0, got %.2f", s))
+	}
+
+	// orrery
+	if n := c.Scene.Orrery.Bodies; n < 4 || n > 8 {
+		errs = append(errs, fmt.Sprintf("scene.orrery.bodies must be between 4 and 8, got %d", n))
+	}
+	if d := c.Scene.Orrery.TrailDecay; d <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.orrery.trail_decay must be > 0, got %.2f", d))
+	}
+
+	// pipes
+	if n := c.Scene.Pipes.Heads; n < 1 {
+		errs = append(errs, fmt.Sprintf("scene.pipes.heads must be >= 1, got %d", n))
+	}
+	if tc := c.Scene.Pipes.TurnChance; tc < 0 || tc > 1 {
+		errs = append(errs, fmt.Sprintf("scene.pipes.turn_chance must be between 0.0 and 1.0, got %.2f", tc))
+	}
+	if s := c.Scene.Pipes.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.pipes.speed must be > 0, got %.2f", s))
+	}
+	if rs := c.Scene.Pipes.ResetSeconds; rs <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.pipes.reset_seconds must be > 0, got %.2f", rs))
+	}
+
+	// maze
+	if ps := c.Scene.Maze.PauseSeconds; ps < 0 {
+		errs = append(errs, fmt.Sprintf("scene.maze.pause_seconds must be >= 0, got %.2f", ps))
+	}
+	if fs := c.Scene.Maze.FadeSeconds; fs < 0 {
+		errs = append(errs, fmt.Sprintf("scene.maze.fade_seconds must be >= 0, got %.2f", fs))
+	}
+	if s := c.Scene.Maze.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.maze.speed must be > 0, got %.2f", s))
+	}
+
+	// life
+	if d := c.Scene.Life.Density; d < 0 || d > 1 {
+		errs = append(errs, fmt.Sprintf("scene.life.density must be between 0.0 and 1.0, got %.2f", d))
+	}
+	if s := c.Scene.Life.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.life.speed must be > 0, got %.2f", s))
+	}
+	if rs := c.Scene.Life.ResetSeconds; rs <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.life.reset_seconds must be > 0, got %.2f", rs))
+	}
+
+	// starfield
+	if n := c.Scene.Starfield.Count; n < 1 {
+		errs = append(errs, fmt.Sprintf("scene.starfield.count must be >= 1, got %d", n))
+	}
+	if s := c.Scene.Starfield.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.starfield.speed must be > 0, got %.2f", s))
+	}
+
+	if len(errs) > 0 {
+		return fmt.Errorf("config validation failed:\n  %s", strings.Join(errs, "\n  "))
+	}
+	return nil
 }
 
 // Path returns the config file path, respecting XDG_CONFIG_HOME.

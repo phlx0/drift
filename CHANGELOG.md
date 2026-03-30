@@ -11,6 +11,7 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **config validation** — `Load()` now rejects out-of-range values for all numeric config fields with a clear multi-line error listing every invalid field
 - **shell snippet tests** — unit tests covering `shellSnippet()` for all supported shells and unsupported-shell error paths
 
 ### Fixed
