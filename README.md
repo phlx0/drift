@@ -301,6 +301,10 @@ reset_seconds = 30.0
 
 [scene.clock]
 show_date = true  # show date below the time
+
+[scene.starfield]
+count = 200 # number of stars
+speed = 1.0 # warp speed multiplier
 ```
 
 ---
