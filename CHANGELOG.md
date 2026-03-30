@@ -9,6 +9,10 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **orrery** scene — terminal resize no longer resets the RNG to the same seed used at init, preventing repetitive asteroid and UFO spawn patterns after resize events
+
 ---
 
 ## [0.10.0] — 2026-03-29

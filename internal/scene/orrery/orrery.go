@@ -114,7 +114,7 @@ func (o *Orrery) Resize(w, h int) {
 
 	o.w, o.h = w, h
 	o.pw, o.ph = w*2, h*4
-	o.rng = rand.New(rand.NewSource(int64(w)*91841 ^ int64(h)*69457 ^ 0x77a31))
+	o.rng = rand.New(rand.NewSource(int64(w)*91841 ^ int64(h)*69457 ^ 0x77a31 ^ int64(o.time*1000)))
 	o.centerX = float64(max(o.pw-1, 0)) / 2
 	o.centerY = float64(max(o.ph-1, 0)) / 2
 	o.allocBuffers()
