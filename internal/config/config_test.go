@@ -122,8 +122,12 @@ func TestValidateRejectsOutOfRangeValues(t *testing.T) {
 
 		// particles
 		{"particles count < 1", func(c *Config) { c.Scene.Particles.Count = 0 }},
+		{"particles friction < 0", func(c *Config) { c.Scene.Particles.Friction = -0.1 }},
+		{"particles friction > 1", func(c *Config) { c.Scene.Particles.Friction = 1.5 }},
 
 		// waveform
+		{"waveform layers < 1", func(c *Config) { c.Scene.Waveform.Layers = 0 }},
+		{"waveform layers > 3", func(c *Config) { c.Scene.Waveform.Layers = 4 }},
 		{"waveform amplitude > 1", func(c *Config) { c.Scene.Waveform.Amplitude = 2.0 }},
 		{"waveform speed <= 0", func(c *Config) { c.Scene.Waveform.Speed = -1 }},
 

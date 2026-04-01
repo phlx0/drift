@@ -228,8 +228,14 @@ func (c *Config) Validate() error {
 	if n := c.Scene.Particles.Count; n < 1 {
 		errs = append(errs, fmt.Sprintf("scene.particles.count must be >= 1, got %d", n))
 	}
+	if f := c.Scene.Particles.Friction; f < 0 || f > 1 {
+		errs = append(errs, fmt.Sprintf("scene.particles.friction must be between 0.0 and 1.0, got %.2f", f))
+	}
 
 	// waveform
+	if l := c.Scene.Waveform.Layers; l < 1 || l > 3 {
+		errs = append(errs, fmt.Sprintf("scene.waveform.layers must be between 1 and 3, got %d", l))
+	}
 	if a := c.Scene.Waveform.Amplitude; a < 0 || a > 1 {
 		errs = append(errs, fmt.Sprintf("scene.waveform.amplitude must be between 0.0 and 1.0, got %.2f", a))
 	}
