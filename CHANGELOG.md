@@ -9,6 +9,10 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [0.11.0] — 2026-04-01
+
 ### Added
 
 - **custom themes** — define your own themes in `config.toml` under `[theme.<name>]` using `#RRGGBB` hex colors; custom themes appear in `drift list themes` and showcase mode alongside built-ins; custom themes with the same name as a built-in override it
