@@ -11,6 +11,7 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **custom themes** — define your own themes in `config.toml` under `[theme.<name>]` using `#RRGGBB` hex colors; custom themes appear in `drift list themes` and showcase mode alongside built-ins; custom themes with the same name as a built-in override it
 - **dvd** scene — the classic bouncing logo; a rounded box drifts around the terminal, changing palette color on each wall bounce and flashing bright on a corner hit; configurable via `[scene.dvd]`: `speed`, `label`
 - **scene transitions** — a smooth fade-to-black between scene switches; duration controlled by `engine.fade_seconds` (default `0.3`s per phase, `0` = instant cut); applies to both automatic cycling and showcase navigation
 - **config validation** — `Load()` now rejects out-of-range values for all numeric config fields with a clear multi-line error listing every invalid field

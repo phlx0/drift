@@ -5,16 +5,33 @@ package config
 
 import (
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/phlx0/drift/internal/scene"
 )
 
 type Config struct {
-	Engine EngineConfig `toml:"engine"`
-	Scene  SceneConfig  `toml:"scene"`
+	Engine EngineConfig                  `toml:"engine"`
+	Scene  SceneConfig                   `toml:"scene"`
+	Theme  map[string]CustomThemeConfig  `toml:"theme"`
+}
+
+// CustomThemeConfig defines a user-supplied theme in config.toml.
+// Colors are hex strings in #RRGGBB format.
+//
+//	[theme.mytheme]
+//	bright  = "#e8e8e8"
+//	palette = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4"]
+//	dim     = ["#3d1010", "#0e2e2c", "#0e2530", "#1a2e20"]
+type CustomThemeConfig struct {
+	Bright  string   `toml:"bright"`
+	Palette []string `toml:"palette"`
+	Dim     []string `toml:"dim"`
 }
 
 type EngineConfig struct {
@@ -179,6 +196,43 @@ func Default() *Config {
 	}
 }
 
+// AllThemes returns the merged set of built-in and user-defined themes.
+// Custom themes override built-ins with the same name.
+func (c *Config) AllThemes() map[string]scene.Theme {
+	all := make(map[string]scene.Theme, len(scene.Themes)+len(c.Theme))
+	maps.Copy(all, scene.Themes)
+	for name, ct := range c.Theme {
+		palette := make([]scene.RGBColor, len(ct.Palette))
+		dim := make([]scene.RGBColor, len(ct.Dim))
+		for i, h := range ct.Palette {
+			if col, err := parseHex(h); err == nil {
+				palette[i] = col
+			}
+		}
+		for i, h := range ct.Dim {
+			if col, err := parseHex(h); err == nil {
+				dim[i] = col
+			}
+		}
+		bright, _ := parseHex(ct.Bright)
+		all[name] = scene.Theme{Name: name, Palette: palette, Dim: dim, Bright: bright}
+	}
+	return all
+}
+
+// parseHex converts a #RRGGBB hex string to an RGBColor.
+func parseHex(s string) (scene.RGBColor, error) {
+	s = strings.TrimPrefix(s, "#")
+	if len(s) != 6 {
+		return scene.RGBColor{}, fmt.Errorf("invalid hex color %q: must be #RRGGBB", "#"+s)
+	}
+	n, err := strconv.ParseUint(s, 16, 32)
+	if err != nil {
+		return scene.RGBColor{}, fmt.Errorf("invalid hex color #%s: %w", s, err)
+	}
+	return scene.RGBColor{R: uint8(n >> 16), G: uint8((n >> 8) & 0xFF), B: uint8(n & 0xFF)}, nil
+}
+
 // Load reads the config file and merges it with compiled-in defaults.
 // Missing keys retain their default values. Returns defaults if no file exists.
 func Load() (*Config, error) {
@@ -317,6 +371,34 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.dvd.speed must be > 0, got %.2f", s))
 	}
 
+	// custom themes
+	for name, ct := range c.Theme {
+		if len(ct.Palette) == 0 {
+			errs = append(errs, fmt.Sprintf("theme.%s.palette must have at least 1 color", name))
+		}
+		if len(ct.Dim) == 0 {
+			errs = append(errs, fmt.Sprintf("theme.%s.dim must have at least 1 color", name))
+		}
+		if len(ct.Palette) > 0 && len(ct.Dim) > 0 && len(ct.Palette) != len(ct.Dim) {
+			errs = append(errs, fmt.Sprintf("theme.%s: palette (%d colors) and dim (%d colors) must be the same length", name, len(ct.Palette), len(ct.Dim)))
+		}
+		if ct.Bright != "" {
+			if _, err := parseHex(ct.Bright); err != nil {
+				errs = append(errs, fmt.Sprintf("theme.%s.bright: %v", name, err))
+			}
+		}
+		for i, h := range ct.Palette {
+			if _, err := parseHex(h); err != nil {
+				errs = append(errs, fmt.Sprintf("theme.%s.palette[%d]: %v", name, i, err))
+			}
+		}
+		for i, h := range ct.Dim {
+			if _, err := parseHex(h); err != nil {
+				errs = append(errs, fmt.Sprintf("theme.%s.dim[%d]: %v", name, i, err))
+			}
+		}
+	}
+
 	if len(errs) > 0 {
 		return fmt.Errorf("config validation failed:\n  %s", strings.Join(errs, "\n  "))
 	}
@@ -436,4 +518,12 @@ speed = 1.0   # warp speed multiplier
 [scene.dvd]
 speed = 1.0     # movement speed multiplier
 label = "drift" # text displayed inside the bouncing logo
+
+# Custom themes — define your own palette with #RRGGBB hex colors.
+# palette and dim must have the same number of entries.
+#
+# [theme.terminal]
+# bright  = "#ffffff"
+# palette = ["#ff5555", "#50fa7b", "#f1fa8c", "#bd93f9"]
+# dim     = ["#3d0000", "#003d00", "#3d3d00", "#1e003d"]
 `

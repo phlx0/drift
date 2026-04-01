@@ -147,11 +147,19 @@ var listCmd = &cobra.Command{
 				fmt.Printf("  %s\n", name)
 			}
 		case "themes":
-			names := scene.ThemeNames()
+			cfg, err := config.Load()
+			if err != nil || cfg == nil {
+				cfg = config.Default()
+			}
+			allThemes := cfg.AllThemes()
+			names := make([]string, 0, len(allThemes))
+			for k := range allThemes {
+				names = append(names, k)
+			}
 			sort.Strings(names)
 			fmt.Println("Available themes:")
 			for _, name := range names {
-				t := scene.Themes[name]
+				t := allThemes[name]
 				swatches := make([]string, len(t.Palette))
 				for i, c := range t.Palette {
 					swatches[i] = colorSwatch(c)

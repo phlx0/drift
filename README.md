@@ -323,6 +323,25 @@ speed = 1.0     # movement speed multiplier
 label = "drift" # text displayed inside the bouncing logo
 ```
 
+### Custom themes
+
+Define your own themes in `config.toml` under `[theme.<name>]`. Custom themes appear alongside built-ins in `drift list themes` and in showcase mode navigation.
+
+```toml
+[theme.terminal]
+bright  = "#ffffff"
+palette = ["#ff5555", "#50fa7b", "#f1fa8c", "#bd93f9"]
+dim     = ["#3d0000", "#003d00", "#3d3d00", "#1e003d"]
+```
+
+| Key | Description |
+|---|---|
+| `bright` | Near-white highlight color (`#RRGGBB`) |
+| `palette` | Accent colors — scenes index with `palette[i % len(palette)]` |
+| `dim` | Darker variants for trails and depth — must be the same length as `palette` |
+
+Then use it like any built-in: `drift --theme terminal`.
+
 ---
 
 ## Showcase mode

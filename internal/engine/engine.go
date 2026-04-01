@@ -83,6 +83,8 @@ type Engine struct {
 	themeIdx   int      // index into themeNames
 	hudTimer   float64  // seconds remaining to show the HUD overlay
 
+	allThemes map[string]scene.Theme // built-in + custom, resolved once at startup
+
 	// transition
 	transition     transitionPhase
 	transitionT    float64 // elapsed time in current phase
@@ -119,8 +121,9 @@ func (e *Engine) Run() error {
 	screen.EnableMouse(tcell.MouseButtonEvents)
 
 	e.screen = screen
+	e.allThemes = e.cfg.AllThemes()
 
-	t, ok := scene.Themes[e.cfg.Engine.Theme]
+	t, ok := e.allThemes[e.cfg.Engine.Theme]
 	if !ok {
 		t = scene.Themes["cosmic"]
 	}
@@ -128,7 +131,10 @@ func (e *Engine) Run() error {
 
 	if e.cfg.Engine.Showcase {
 		e.scenes = scenes.All(e.cfg.Scene)
-		names := scene.ThemeNames()
+		names := make([]string, 0, len(e.allThemes))
+		for k := range e.allThemes {
+			names = append(names, k)
+		}
 		sort.Strings(names)
 		e.themeNames = names
 		themeName := e.cfg.Engine.Theme
@@ -286,13 +292,13 @@ func (e *Engine) beginTransition(next, w, h int) {
 
 func (e *Engine) nextTheme(w, h int) {
 	e.themeIdx = (e.themeIdx + 1) % len(e.themeNames)
-	e.theme = scene.Themes[e.themeNames[e.themeIdx]]
+	e.theme = e.allThemes[e.themeNames[e.themeIdx]]
 	e.scenes[e.cur].Init(w, h, e.theme)
 }
 
 func (e *Engine) prevTheme(w, h int) {
 	e.themeIdx = (e.themeIdx - 1 + len(e.themeNames)) % len(e.themeNames)
-	e.theme = scene.Themes[e.themeNames[e.themeIdx]]
+	e.theme = e.allThemes[e.themeNames[e.themeIdx]]
 	e.scenes[e.cur].Init(w, h, e.theme)
 }
 

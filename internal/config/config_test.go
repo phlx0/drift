@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/phlx0/drift/internal/scene"
 )
 
 func TestDefaultsAreValid(t *testing.T) {
@@ -101,6 +103,84 @@ func TestValidateAcceptsDefaults(t *testing.T) {
 	}
 }
 
+func TestParseHex(t *testing.T) {
+	tests := []struct {
+		input   string
+		wantR   uint8
+		wantErr bool
+	}{
+		{"#ff0000", 255, false},
+		{"#00ff00", 0, false},
+		{"ff0000", 255, false}, // without #
+		{"gggggg", 0, true},
+		{"#fff", 0, true}, // too short
+	}
+	for _, tt := range tests {
+		c, err := parseHex(tt.input)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("parseHex(%q) error=%v wantErr=%v", tt.input, err, tt.wantErr)
+			continue
+		}
+		if !tt.wantErr && c.R != tt.wantR {
+			t.Errorf("parseHex(%q).R = %d, want %d", tt.input, c.R, tt.wantR)
+		}
+	}
+}
+
+func TestAllThemesIncludesBuiltins(t *testing.T) {
+	cfg := Default()
+	all := cfg.AllThemes()
+	if _, ok := all["cosmic"]; !ok {
+		t.Error("AllThemes() should include built-in theme 'cosmic'")
+	}
+	if len(all) < len(scene.Themes) {
+		t.Errorf("AllThemes() has %d entries, want at least %d", len(all), len(scene.Themes))
+	}
+}
+
+func TestAllThemesMergesCustom(t *testing.T) {
+	cfg := Default()
+	cfg.Theme = map[string]CustomThemeConfig{
+		"myterm": {
+			Bright:  "#ffffff",
+			Palette: []string{"#ff0000", "#00ff00"},
+			Dim:     []string{"#400000", "#004000"},
+		},
+	}
+	all := cfg.AllThemes()
+	ct, ok := all["myterm"]
+	if !ok {
+		t.Fatal("AllThemes() should include custom theme 'myterm'")
+	}
+	if ct.Name != "myterm" {
+		t.Errorf("custom theme Name = %q, want 'myterm'", ct.Name)
+	}
+	if len(ct.Palette) != 2 {
+		t.Errorf("custom theme palette len = %d, want 2", len(ct.Palette))
+	}
+	if ct.Palette[0].R != 255 || ct.Palette[0].G != 0 {
+		t.Errorf("first palette color = %+v, want R=255 G=0", ct.Palette[0])
+	}
+	if ct.Bright.R != 255 || ct.Bright.G != 255 || ct.Bright.B != 255 {
+		t.Errorf("bright = %+v, want #ffffff", ct.Bright)
+	}
+}
+
+func TestAllThemesCustomOverridesBuiltin(t *testing.T) {
+	cfg := Default()
+	cfg.Theme = map[string]CustomThemeConfig{
+		"cosmic": { // overrides the built-in
+			Bright:  "#ff0000",
+			Palette: []string{"#111111"},
+			Dim:     []string{"#000000"},
+		},
+	}
+	all := cfg.AllThemes()
+	if all["cosmic"].Bright.R != 255 || all["cosmic"].Bright.G != 0 {
+		t.Error("custom theme should override built-in with the same name")
+	}
+}
+
 func TestValidateRejectsOutOfRangeValues(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -155,6 +235,31 @@ func TestValidateRejectsOutOfRangeValues(t *testing.T) {
 		// starfield
 		{"starfield count < 1", func(c *Config) { c.Scene.Starfield.Count = 0 }},
 		{"starfield speed <= 0", func(c *Config) { c.Scene.Starfield.Speed = 0 }},
+
+		// dvd
+		{"dvd speed <= 0", func(c *Config) { c.Scene.DVD.Speed = 0 }},
+
+		// custom theme validation
+		{"custom theme empty palette", func(c *Config) {
+			c.Theme = map[string]CustomThemeConfig{
+				"bad": {Bright: "#ffffff", Palette: []string{}, Dim: []string{"#000000"}},
+			}
+		}},
+		{"custom theme palette/dim length mismatch", func(c *Config) {
+			c.Theme = map[string]CustomThemeConfig{
+				"bad": {Bright: "#ffffff", Palette: []string{"#ff0000"}, Dim: []string{"#100000", "#200000"}},
+			}
+		}},
+		{"custom theme invalid palette hex", func(c *Config) {
+			c.Theme = map[string]CustomThemeConfig{
+				"bad": {Bright: "#ffffff", Palette: []string{"notahex"}, Dim: []string{"#000000"}},
+			}
+		}},
+		{"custom theme invalid bright hex", func(c *Config) {
+			c.Theme = map[string]CustomThemeConfig{
+				"bad": {Bright: "zzz", Palette: []string{"#ff0000"}, Dim: []string{"#100000"}},
+			}
+		}},
 	}
 
 	for _, tt := range tests {
