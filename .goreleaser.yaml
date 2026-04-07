@@ -47,6 +47,7 @@ brews:
       owner: phlx0
       name: homebrew-drift
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
