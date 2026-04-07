@@ -18,6 +18,8 @@ Every OS has a screensaver. The terminal had nothing — until now.
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](CONTRIBUTING.md)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-brightgreen?style=flat-square)](https://github.com/phlx0/drift/releases)
 [![AUR](https://img.shields.io/aur/version/drift-bin?style=flat-square&label=AUR&color=1793d1)](https://aur.archlinux.org/packages/drift-bin)
+[![Homebrew](https://img.shields.io/badge/homebrew-phlx0%2Fdrift-orange?style=flat-square&logo=homebrew)](https://github.com/phlx0/homebrew-drift)
+[![Downloads](https://img.shields.io/github/downloads/phlx0/drift/total?style=flat-square&label=downloads)](https://github.com/phlx0/drift/releases)
 
 </div>
 
