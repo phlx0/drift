@@ -9,6 +9,11 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Homebrew tap** — `brew install phlx0/drift/drift`; GoReleaser publishes the formula to `phlx0/homebrew-drift` on every release
+- **Nix flake** — `nix run github:phlx0/drift`; `flake.nix` exposes a `packages.default` and `devShells.default`
+
 ---
 
 ## [0.11.0] — 2026-04-01
@@ -244,6 +249,7 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[0.11.0]: https://github.com/phlx0/drift/releases/tag/v0.11.0
 [0.10.0]: https://github.com/phlx0/drift/releases/tag/v0.10.0
 [0.9.0]: https://github.com/phlx0/drift/releases/tag/v0.9.0
 [0.8.2]: https://github.com/phlx0/drift/releases/tag/v0.8.2

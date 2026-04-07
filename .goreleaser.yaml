@@ -41,5 +41,22 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
+brews:
+  - name: drift
+    repository:
+      owner: phlx0
+      name: homebrew-drift
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    homepage: "https://github.com/phlx0/drift"
+    description: "Terminal screensaver and ambient visualiser"
+    license: "MIT"
+    install: |
+      bin.install "drift"
+    test: |
+      system "#{bin}/drift", "version"
+
 # Release notes are extracted from CHANGELOG.md by the release workflow.
 # See .github/workflows/release.yml

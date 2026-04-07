@@ -29,7 +29,7 @@ Every OS has a screensaver. The terminal had nothing — until now.
 
 ## Scenes
 
-drift ships eleven animations. They cycle automatically or you can lock to one.
+drift ships **11 scenes** and **9 built-in themes**. They cycle automatically or you can lock to one.
 
 <table>
 <tr>
@@ -140,13 +140,31 @@ drift list themes    # preview all themes with color swatches
 
 ## Installation
 
-### Option 1 — AUR (Arch Linux)
+### Option 1 — Homebrew (macOS and Linux)
+
+```bash
+brew install phlx0/drift/drift
+```
+
+### Option 2 — AUR (Arch Linux)
 
 ```bash
 yay -S drift-bin   # or: paru -S drift-bin
 ```
 
-### Option 2 — Pre-built binary (no Go required)
+### Option 3 — Nix flake
+
+```bash
+nix run github:phlx0/drift
+```
+
+Or add to your configuration:
+
+```nix
+inputs.drift.url = "github:phlx0/drift";
+```
+
+### Option 4 — Pre-built binary (no Go required)
 
 1. Go to the [Releases](https://github.com/phlx0/drift/releases) page.
 2. Download the archive for your platform:
@@ -167,7 +185,7 @@ yay -S drift-bin   # or: paru -S drift-bin
    drift version
    ```
 
-### Option 3 — Go install
+### Option 5 — Go install
 
 ```bash
 go install github.com/phlx0/drift@latest
@@ -180,7 +198,7 @@ Make sure Go's bin directory is on your `PATH`:
 export PATH="$PATH:$(go env GOPATH)/bin"
 ```
 
-### Option 4 — Build from source
+### Option 6 — Build from source
 
 ```bash
 git clone https://github.com/phlx0/drift
