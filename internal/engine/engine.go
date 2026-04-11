@@ -433,9 +433,11 @@ func (e *Engine) buildScenes() []scene.Scene {
 
 	var result []scene.Scene
 	for _, name := range strings.Split(spec, ",") {
-		name = strings.TrimSpace(name)
+		name = strings.ToLower(strings.TrimSpace(name))
 		if s := scenes.ByName(name, e.cfg.Scene); s != nil {
 			result = append(result, s)
+		} else {
+			fmt.Fprintf(os.Stderr, "drift: unknown scene %q (ignored) — run 'drift list scenes' to see available scenes\n", name)
 		}
 	}
 	if len(result) == 0 {

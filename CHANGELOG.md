@@ -9,6 +9,11 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Scene name matching is now case-insensitive (`--scene Rain` works, not just `--scene rain`)
+- Unknown scene names in `--scene` / config now print a warning to stderr instead of silently falling back to all scenes
+
 ---
 
 ## [1.0.0] — 2026-04-07
