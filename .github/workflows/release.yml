@@ -59,7 +59,7 @@ jobs:
           cat /tmp/release_notes.md
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v7.1.0
+        uses: goreleaser/goreleaser-action@v7.2.1
         with:
           distribution: goreleaser
           version: "~> v2"
