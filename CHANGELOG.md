@@ -7,7 +7,7 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased]
+## [1.1.0] — 2026-05-12
 
 ### Added
 
