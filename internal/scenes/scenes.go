@@ -3,6 +3,7 @@ package scenes
 import (
 	"github.com/phlx0/drift/internal/config"
 	"github.com/phlx0/drift/internal/scene"
+	"github.com/phlx0/drift/internal/scene/boids"
 	"github.com/phlx0/drift/internal/scene/clock"
 	"github.com/phlx0/drift/internal/scene/constellation"
 	"github.com/phlx0/drift/internal/scene/dvd"
@@ -11,6 +12,7 @@ import (
 	"github.com/phlx0/drift/internal/scene/orrery"
 	"github.com/phlx0/drift/internal/scene/particles"
 	"github.com/phlx0/drift/internal/scene/pipes"
+	"github.com/phlx0/drift/internal/scene/plasma"
 	"github.com/phlx0/drift/internal/scene/rain"
 	"github.com/phlx0/drift/internal/scene/starfield"
 	"github.com/phlx0/drift/internal/scene/waveform"
@@ -29,6 +31,8 @@ func All(cfg config.SceneConfig) []scene.Scene {
 		clock.New(cfg.Clock),
 		starfield.New(cfg.Starfield),
 		dvd.New(cfg.DVD),
+		boids.New(cfg.Boids),
+		plasma.New(cfg.Plasma),
 	}
 }
 

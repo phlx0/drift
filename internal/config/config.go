@@ -50,6 +50,10 @@ type EngineConfig struct {
 	// Showcase keeps running continuously; arrow/wasd keys cycle scenes and
 	// themes, Escape exits.
 	Showcase bool `toml:"showcase"`
+	// OLEDShift nudges all scene content by 1 cell every 10 seconds, cycling a
+	// 3×3 grid, to reduce static pixel retention on OLED displays. Has no
+	// effect on typical terminal emulators where the OS handles burn-in.
+	OLEDShift bool `toml:"oled_shift"`
 }
 
 type SceneConfig struct {
@@ -64,6 +68,18 @@ type SceneConfig struct {
 	Clock         ClockConfig         `toml:"clock"`
 	Starfield     StarfieldConfig     `toml:"starfield"`
 	DVD           DVDConfig           `toml:"dvd"`
+	Boids         BoidsConfig         `toml:"boids"`
+	Plasma        PlasmaConfig        `toml:"plasma"`
+}
+
+type BoidsConfig struct {
+	Count int     `toml:"count"` // number of boids
+	Speed float64 `toml:"speed"` // movement speed multiplier
+}
+
+type PlasmaConfig struct {
+	Speed float64 `toml:"speed"` // animation speed multiplier
+	Scale float64 `toml:"scale"` // spatial scale multiplier
 }
 
 type DVDConfig struct {
@@ -191,6 +207,14 @@ func Default() *Config {
 			DVD: DVDConfig{
 				Speed: 1.0,
 				Label: "drift",
+			},
+			Boids: BoidsConfig{
+				Count: 60,
+				Speed: 1.0,
+			},
+			Plasma: PlasmaConfig{
+				Speed: 1.0,
+				Scale: 1.0,
 			},
 		},
 	}
@@ -371,6 +395,22 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.dvd.speed must be > 0, got %.2f", s))
 	}
 
+	// boids
+	if n := c.Scene.Boids.Count; n < 1 {
+		errs = append(errs, fmt.Sprintf("scene.boids.count must be >= 1, got %d", n))
+	}
+	if s := c.Scene.Boids.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.boids.speed must be > 0, got %.2f", s))
+	}
+
+	// plasma
+	if s := c.Scene.Plasma.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.plasma.speed must be > 0, got %.2f", s))
+	}
+	if s := c.Scene.Plasma.Scale; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.plasma.scale must be > 0, got %.2f", s))
+	}
+
 	// custom themes
 	for name, ct := range c.Theme {
 		if len(ct.Palette) == 0 {
@@ -466,6 +506,7 @@ scenes        = "all"  # comma-separated list or "all"
 theme         = "cosmic" # cosmic | nord | dracula | catppuccin | gruvbox | forest | wildberries | mono | rosepine
 shuffle       = true   # randomise scene order
 hide_tmux_status = false  # tmux: hide status bar while displaying scene
+oled_shift       = false  # shift scene content by 1 cell every 10s to reduce OLED burn-in; only useful on bare OLED hardware
 
 [scene.constellation]
 star_count      = 80
@@ -518,6 +559,14 @@ speed = 1.0   # warp speed multiplier
 [scene.dvd]
 speed = 1.0     # movement speed multiplier
 label = "drift" # text displayed inside the bouncing logo
+
+[scene.boids]
+count = 60    # number of boids
+speed = 1.0   # movement speed multiplier
+
+[scene.plasma]
+speed = 1.0   # animation speed multiplier
+scale = 1.0   # spatial scale multiplier (higher = zoomed in)
 
 # Custom themes — define your own palette with #RRGGBB hex colors.
 # palette and dim must have the same number of entries.
