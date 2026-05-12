@@ -9,8 +9,21 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **boids** scene — Reynolds flocking simulation; triangle-arrow heads with fading trails, three steering rules (separation, alignment, cohesion); configurable `count` and `speed`
+- **plasma** scene — classic demoscene sine-sum color field; four overlapping waves with a drifting radial center; density characters (`░▒▓█`) layer depth; configurable `speed` and `scale`
+- `engine.oled_shift` config flag (default `false`) — OLED pixel-shift now opt-in instead of always active
+
+### Changed
+
+- **dvd** base speed raised from 10 → 16 cells/s (vy 5 → 8); crosses a new cell boundary roughly every 2 frames at 30 fps for noticeably smoother motion; tune back with `speed = 0.65`
+
 ### Fixed
 
+- **dvd** bounce now reflects the overshoot (`2·maxX − x`) instead of clamping to the wall; eliminates the one-frame "stick" before reversing direction
+- **dvd** double velocity-flip on tiny terminals: when the logo is wider/taller than the available space, velocity is zeroed instead of being flipped twice (which left the logo oscillating in place)
+- **plasma** spatial frequency doubled (base multiplier 6 → 12); blobs are now small enough relative to the terminal that edges cut through the middle of a pattern instead of at a band boundary
 - Scene name matching is now case-insensitive (`--scene Rain` works, not just `--scene rain`)
 - Unknown scene names in `--scene` / config now print a warning to stderr instead of silently falling back to all scenes
 

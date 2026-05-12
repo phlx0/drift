@@ -31,7 +31,7 @@ Every OS has a screensaver. The terminal had nothing — until now.
 
 ## Scenes
 
-drift ships **11 scenes** and **9 built-in themes**. They cycle automatically or you can lock to one.
+drift ships **13 scenes** and **9 built-in themes**. They cycle automatically or you can lock to one.
 
 <table>
 <tr>
@@ -120,6 +120,22 @@ drift ships **11 scenes** and **9 built-in themes**. They cycle automatically or
 **dvd** — the classic bouncing logo; changes palette color on each wall bounce and flashes bright on a corner hit
 
 <img src="demo/dvd.gif" width="100%" />
+
+</td>
+<td width="50%">
+
+**boids** — Reynolds flocking simulation; triangle-arrow heads leave fading trails as separation, alignment, and cohesion rules steer the flock
+
+<img src="demo/boids.gif" width="100%" />
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**plasma** — classic demoscene sine-sum color field; four overlapping waves with a drifting radial centre map through the active theme palette
+
+<img src="demo/plasma.gif" width="100%" />
 
 </td>
 <td width="50%">
@@ -289,6 +305,7 @@ scenes           = "all"
 theme            = "cosmic"
 shuffle          = true
 hide_tmux_status = false
+oled_shift       = false  # 1-cell shift every 10s; only useful on bare OLED hardware
 
 [scene.constellation]
 star_count      = 80
@@ -341,6 +358,14 @@ speed = 1.0   # warp speed multiplier
 [scene.dvd]
 speed = 1.0     # movement speed multiplier
 label = "drift" # text displayed inside the bouncing logo
+
+[scene.boids]
+count = 60    # number of boids
+speed = 1.0   # movement speed multiplier
+
+[scene.plasma]
+speed = 1.0   # animation speed multiplier
+scale = 1.0   # spatial scale (higher = more zoomed in / larger blobs)
 ```
 
 ### Custom themes
