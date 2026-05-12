@@ -28,10 +28,10 @@ builds:
 
 archives:
   - id: default
-    format: tar.gz
+    formats: [tar.gz]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     files:
       - README.md
@@ -41,7 +41,7 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
-brews:
+homebrew:
   - name: drift
     repository:
       owner: phlx0

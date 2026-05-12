@@ -58,6 +58,11 @@ jobs:
           echo "--- release notes ---"
           cat /tmp/release_notes.md
 
+      - name: Delete existing release if present
+        run: gh release delete "${{ github.ref_name }}" --yes 2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7.2.1
         with:
