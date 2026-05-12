@@ -347,16 +347,18 @@ func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 		dt = 0.1
 	}
 
-	// Advance OLED pixel shift: nudge by 1 cell every 10 seconds,
-	// cycling through a 3×3 grid so every position resets to (0,0)
-	// after 90 seconds.
-	e.shiftTimer += dt
-	if e.shiftTimer >= 10.0 {
-		e.shiftTimer -= 10.0
-		e.shiftOX = (e.shiftOX + 1) % 3
-		if e.shiftOX == 0 {
-			e.shiftOY = (e.shiftOY + 1) % 3
+	// Advance OLED pixel shift when enabled.
+	if e.cfg.Engine.OLEDShift {
+		e.shiftTimer += dt
+		if e.shiftTimer >= 10.0 {
+			e.shiftTimer -= 10.0
+			e.shiftOX = (e.shiftOX + 1) % 3
+			if e.shiftOX == 0 {
+				e.shiftOY = (e.shiftOY + 1) % 3
+			}
 		}
+	} else {
+		e.shiftOX, e.shiftOY = 0, 0
 	}
 
 	// Advance transition state machine.
