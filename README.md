@@ -8,8 +8,6 @@
 
 **A terminal screensaver that turns idle time into ambient art.**
 
-Every OS has a screensaver. The terminal had nothing — until now.
-
 [![Go](https://img.shields.io/badge/go-1.23+-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/phlx0/drift?style=flat-square&color=blueviolet)](https://github.com/phlx0/drift/releases)
