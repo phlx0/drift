@@ -10,12 +10,10 @@ linters:
     - ineffassign
     - gofmt
     - misspell
-  settings:
-    gofmt:
-      simplify: true
 
 issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
