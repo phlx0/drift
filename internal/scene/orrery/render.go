@@ -250,21 +250,21 @@ func (o *Orrery) buildBrailleCell(cx, cy int) (rune, tcell.Style, bool) {
 			mask |= uint8(1) << scene.BrailleOffsets[subRow][subCol]
 			total += brightness
 
-			switch owner := o.pixelOwner[px][py]; {
-			case owner == orrerySunOwner:
+			switch o.pixelOwner[px][py] {
+			case orrerySunOwner:
 				sunEnergy += brightness
-			case owner == orreryOrbitOwner:
+			case orreryOrbitOwner:
 				orbitEnergy += brightness
-			case owner == orreryStarOwner:
+			case orreryStarOwner:
 				starEnergy += brightness
-			case owner == orreryAsteroidOwner:
+			case orreryAsteroidOwner:
 				asteroidEnergy += brightness
-			case owner == orreryUFODomeOwner:
+			case orreryUFODomeOwner:
 				ufoDomeEnergy += brightness
-			case owner == orreryUFOOwner:
+			case orreryUFOOwner:
 				ufoEnergy += brightness
 			default:
-				paletteEnergy[int(owner)%len(paletteEnergy)] += brightness
+				paletteEnergy[int(o.pixelOwner[px][py])%len(paletteEnergy)] += brightness
 			}
 		}
 	}

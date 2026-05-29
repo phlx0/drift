@@ -25,7 +25,7 @@ type shiftScreen struct {
 }
 
 func (s *shiftScreen) SetContent(x, y int, main rune, comb []rune, style tcell.Style) {
-	w, h := s.Screen.Size()
+	w, h := s.Size()
 	nx, ny := x+s.ox, y+s.oy
 	if nx >= 0 && nx < w && ny >= 0 && ny < h {
 		s.Screen.SetContent(nx, ny, main, comb, style)
