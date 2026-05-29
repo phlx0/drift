@@ -1,3 +1,5 @@
+version: "2"
+
 linters:
   enable:
     - govet
@@ -6,13 +8,11 @@ linters:
     - unused
     - gosimple
     - ineffassign
-    - typecheck
     - gofmt
     - misspell
-
-linters-settings:
-  gofmt:
-    simplify: true
+  settings:
+    gofmt:
+      simplify: true
 
 issues:
   exclude-rules:
