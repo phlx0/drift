@@ -436,7 +436,7 @@ New scenes and themes are very welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) f
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=phlx0/drift&type=Date)](https://star-history.com/#phlx0/drift&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=phlx0/drift&type=Date)](https://star-history.dera.page/#phlx0/drift&Date)
 
 ---
 
