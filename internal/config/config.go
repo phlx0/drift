@@ -526,7 +526,7 @@ fps           = 30     # target frames per second
 cycle_seconds = 60     # seconds per scene, 0 = stay on one scene
 fade_seconds  = 0.3   # fade-to-black duration between scenes, 0 = instant cut
 scenes        = "all"  # comma-separated list or "all"
-theme         = "cosmic" # cosmic | nord | dracula | catppuccin | gruvbox | forest | wildberries | mono | rosepine
+theme         = "cosmic" # cosmic | nord | dracula | catppuccin | gruvbox | forest | wildberries | mono | rosepine | ansi
 shuffle       = true   # randomise scene order
 hide_tmux_status = false  # tmux: hide status bar while displaying scene
 oled_shift       = false  # shift scene content by 1 cell every 10s to reduce OLED burn-in; only useful on bare OLED hardware
