@@ -41,7 +41,7 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
-homebrew:
+brews:
   - name: drift
     repository:
       owner: phlx0
