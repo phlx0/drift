@@ -81,6 +81,11 @@ type Theme struct {
 	Dim []RGBColor
 	// Bright is a near-white highlight for peaks and heads.
 	Bright RGBColor
+	// ANSI marks a theme as terminal-palette based. The engine snaps every
+	// color the scenes draw to the nearest of the terminal's 16 ANSI colors,
+	// so the palette above is only a set of reference values — the terminal
+	// decides what they actually look like.
+	ANSI bool
 }
 
 var Themes = map[string]Theme{
@@ -212,6 +217,7 @@ var Themes = map[string]Theme{
 		},
 		Bright: RGBColor{180, 255, 200},
 	},
+	"ansi": ansiTheme(),
 	"rosepine": {
 		Name: "rosepine",
 		Palette: []RGBColor{

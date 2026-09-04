@@ -162,7 +162,7 @@ var listCmd = &cobra.Command{
 				t := allThemes[name]
 				swatches := make([]string, len(t.Palette))
 				for i, c := range t.Palette {
-					swatches[i] = colorSwatch(c)
+					swatches[i] = colorSwatch(c, t.ANSI)
 				}
 				fmt.Printf("  %-14s  %s\n", name, strings.Join(swatches, " "))
 			}
@@ -173,8 +173,22 @@ var listCmd = &cobra.Command{
 	},
 }
 
-func colorSwatch(c scene.RGBColor) string {
+// colorSwatch renders a two-cell block in c. Themes flagged ansi are drawn
+// with the matching palette index instead, so the preview shows the colors the
+// terminal will actually use.
+func colorSwatch(c scene.RGBColor, ansi bool) string {
+	if ansi {
+		return fmt.Sprintf("\x1b[%dm██\x1b[0m", ansiSGR(scene.ANSIIndex(c)))
+	}
 	return fmt.Sprintf("\x1b[38;2;%d;%d;%dm██\x1b[0m", c.R, c.G, c.B)
+}
+
+// ansiSGR maps an ANSI palette index (0-15) to its foreground SGR parameter.
+func ansiSGR(idx int) int {
+	if idx < 8 {
+		return 30 + idx
+	}
+	return 90 + idx - 8
 }
 
 var versionCmd = &cobra.Command{

@@ -7,6 +7,14 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **ansi** theme — renders with the terminal's own 0–15 palette instead of fixed true-color values: every color a scene produces, interpolated trails and fades included, is snapped to the nearest of the sixteen, so drift follows whatever colorscheme the terminal is configured with and stays readable on terminals without true-color support
+
+---
+
 ## [1.2.0] — 2026-09-04
 
 ### Added
