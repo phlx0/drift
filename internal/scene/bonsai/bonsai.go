@@ -69,6 +69,7 @@ type Bonsai struct {
 
 	maxSegs      int
 	branchesLeft int
+	branchesMade int
 	state        bonsaiState
 	growTimer    float64
 	petalTimer   float64
@@ -115,6 +116,7 @@ func (b *Bonsai) reset() {
 	b.stateTimer = 0
 	b.maxSegs = b.w * b.h / 3
 	b.branchesLeft = 9 + b.w*b.h/300
+	b.branchesMade = 0
 
 	if b.w < 16 || b.h < 8 {
 		b.groundY = b.h - 1
@@ -206,7 +208,8 @@ func (b *Bonsai) step() {
 		if !b.advance(&t) {
 			continue
 		}
-		if child, ok := b.maybeBranch(&t); ok {
+		projected := len(next) + len(b.tips) - i
+		if child, ok := b.maybeBranch(&t, projected); ok {
 			next = append(next, child)
 		}
 		next = append(next, t)
@@ -248,14 +251,17 @@ func (b *Bonsai) advance(t *tip) bool {
 	return len(b.segs) < b.maxSegs
 }
 
-func (b *Bonsai) maybeBranch(t *tip) (tip, bool) {
+func (b *Bonsai) maybeBranch(t *tip, liveTips int) (tip, bool) {
 	if t.depth >= maxDepth || len(b.segs) >= b.maxSegs {
 		return tip{}, false
 	}
-	if b.branchesLeft <= 0 || len(b.tips) >= maxTips {
+	if b.branchesLeft <= 0 || liveTips >= maxTips {
 		return tip{}, false
 	}
 	chance := 0.34 - float64(t.depth)*0.06
+	if t.depth == 0 && b.branchesMade == 0 && float64(t.life) <= float64(t.baseLife)*0.6 {
+		chance = 1
+	}
 	if t.depth == 0 && t.life > t.baseLife-2 {
 		chance = 0
 	}
@@ -280,6 +286,7 @@ func (b *Bonsai) maybeBranch(t *tip) (tip, bool) {
 	}
 	aim := clampAim(t.aim + spread)
 	b.branchesLeft--
+	b.branchesMade++
 
 	return tip{
 		x:        t.x,

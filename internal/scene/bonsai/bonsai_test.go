@@ -158,19 +158,21 @@ func TestBonsaiPetalsDriftWhileHeld(t *testing.T) {
 }
 
 func TestBonsaiBranchBudgetRespected(t *testing.T) {
-	b := newTestBonsai(80, 24)
-	budget := b.branchesLeft
-	for i := 0; i < 600 && b.state == bonsaiGrowing; i++ {
-		b.Update(0.05)
-		if b.branchesLeft < 0 {
-			t.Fatal("branch budget went negative")
+	for tree := 0; tree < 50; tree++ {
+		b := newTestBonsai(80, 24)
+		budget := b.branchesLeft
+		for i := 0; i < 600 && b.state == bonsaiGrowing; i++ {
+			b.Update(0.05)
+			if b.branchesLeft < 0 {
+				t.Fatal("branch budget went negative")
+			}
+			if len(b.tips) > maxTips {
+				t.Fatalf("concurrent tips %d exceeded cap %d", len(b.tips), maxTips)
+			}
 		}
-		if len(b.tips) > maxTips {
-			t.Fatalf("concurrent tips %d exceeded cap %d", len(b.tips), maxTips)
+		if b.branchesLeft == budget {
+			t.Error("expected the tree to spend some of its branch budget")
 		}
-	}
-	if b.branchesLeft == budget {
-		t.Error("expected the tree to spend some of its branch budget")
 	}
 }
 
