@@ -47,6 +47,7 @@ demo:
 	vhs demo/maze.tape
 	vhs demo/life.tape
 	vhs demo/clock.tape
+	vhs demo/bonsai.tape
 	vhs demo/demo.tape
 
 ## help: print this help

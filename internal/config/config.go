@@ -70,6 +70,13 @@ type SceneConfig struct {
 	DVD           DVDConfig           `toml:"dvd"`
 	Boids         BoidsConfig         `toml:"boids"`
 	Plasma        PlasmaConfig        `toml:"plasma"`
+	Bonsai        BonsaiConfig        `toml:"bonsai"`
+}
+
+type BonsaiConfig struct {
+	PauseSeconds float64 `toml:"pause_seconds"` // seconds to hold the finished tree before it dissolves
+	FadeSeconds  float64 `toml:"fade_seconds"`  // seconds the dissolve takes
+	Speed        float64 `toml:"speed"`         // growth speed multiplier
 }
 
 type BoidsConfig struct {
@@ -215,6 +222,11 @@ func Default() *Config {
 			Plasma: PlasmaConfig{
 				Speed: 1.0,
 				Scale: 1.0,
+			},
+			Bonsai: BonsaiConfig{
+				PauseSeconds: 6.0,
+				FadeSeconds:  2.5,
+				Speed:        1.0,
 			},
 		},
 	}
@@ -411,6 +423,17 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.plasma.scale must be > 0, got %.2f", s))
 	}
 
+	// bonsai
+	if ps := c.Scene.Bonsai.PauseSeconds; ps < 0 {
+		errs = append(errs, fmt.Sprintf("scene.bonsai.pause_seconds must be >= 0, got %.2f", ps))
+	}
+	if fs := c.Scene.Bonsai.FadeSeconds; fs < 0 {
+		errs = append(errs, fmt.Sprintf("scene.bonsai.fade_seconds must be >= 0, got %.2f", fs))
+	}
+	if s := c.Scene.Bonsai.Speed; s <= 0 {
+		errs = append(errs, fmt.Sprintf("scene.bonsai.speed must be > 0, got %.2f", s))
+	}
+
 	// custom themes
 	for name, ct := range c.Theme {
 		if len(ct.Palette) == 0 {
@@ -567,6 +590,11 @@ speed = 1.0   # movement speed multiplier
 [scene.plasma]
 speed = 1.0   # animation speed multiplier
 scale = 1.0   # spatial scale multiplier (higher = zoomed in)
+
+[scene.bonsai]
+pause_seconds = 6.0   # seconds to hold the finished tree before it dissolves
+fade_seconds  = 2.5   # seconds the dissolve takes
+speed         = 1.0   # growth speed multiplier
 
 # Custom themes — define your own palette with #RRGGBB hex colors.
 # palette and dim must have the same number of entries.

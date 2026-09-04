@@ -29,7 +29,7 @@
 
 ## Scenes
 
-drift ships **13 scenes** and **9 built-in themes**. They cycle automatically or you can lock to one.
+drift ships **14 scenes** and **9 built-in themes**. They cycle automatically or you can lock to one.
 
 <table>
 <tr>
@@ -137,6 +137,11 @@ drift ships **13 scenes** and **9 built-in themes**. They cycle automatically or
 
 </td>
 <td width="50%">
+
+**bonsai** — a leaning, tapered trunk grows out of a shallow pot and spreads flat foliage pads;
+
+<img src="demo/bonsai.gif" width="100%" />
+
 </td>
 </tr>
 </table>
@@ -364,6 +369,11 @@ speed = 1.0   # movement speed multiplier
 [scene.plasma]
 speed = 1.0   # animation speed multiplier
 scale = 1.0   # spatial scale (higher = more zoomed in / larger blobs)
+
+[scene.bonsai]
+pause_seconds = 6.0   # seconds to hold the finished tree before it dissolves
+fade_seconds  = 2.5   # seconds the dissolve takes
+speed         = 1.0   # growth speed multiplier
 ```
 
 ### Custom themes

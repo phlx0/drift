@@ -7,6 +7,14 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **bonsai** scene — a procedural bonsai grows out of a shallow pot: root flare, S-curved trunk tapering 3 cells wide to 1, primary branches leaving almost horizontally into flat foliage pads, and blossoms drifting down while the finished tree is held before it dissolves and regrows; configurable `pause_seconds`, `fade_seconds` and `speed`
+
+---
+
 ## [1.1.0] — 2026-05-12
 
 ### Added

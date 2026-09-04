@@ -4,6 +4,7 @@ import (
 	"github.com/phlx0/drift/internal/config"
 	"github.com/phlx0/drift/internal/scene"
 	"github.com/phlx0/drift/internal/scene/boids"
+	"github.com/phlx0/drift/internal/scene/bonsai"
 	"github.com/phlx0/drift/internal/scene/clock"
 	"github.com/phlx0/drift/internal/scene/constellation"
 	"github.com/phlx0/drift/internal/scene/dvd"
@@ -33,6 +34,7 @@ func All(cfg config.SceneConfig) []scene.Scene {
 		dvd.New(cfg.DVD),
 		boids.New(cfg.Boids),
 		plasma.New(cfg.Plasma),
+		bonsai.New(cfg.Bonsai),
 	}
 }
 
