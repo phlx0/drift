@@ -28,7 +28,7 @@
 
 ## Scenes
 
-drift ships **14 scenes** and **9 built-in themes**. They cycle automatically or you can lock to one.
+drift ships **14 scenes** and **10 built-in themes**. They cycle automatically or you can lock to one.
 
 <table>
 <tr>
@@ -147,10 +147,9 @@ drift ships **14 scenes** and **9 built-in themes**. They cycle automatically or
 
 ## Themes
 
-Nine built-in themes matched to popular terminal colorschemes.
+Ten built-in themes matched to popular terminal colorschemes.
 
-`cosmic` · `nord` · `dracula` · `catppuccin` · `gruvbox` · `forest` · `wildberries` · `mono` · `rosepine`
-
+`cosmic` · `nord` · `dracula` · `catppuccin` · `gruvbox` · `forest` · `wildberries` · `mono` · `rosepine` · `ansi`
 
 ```bash
 drift list themes    # preview all themes with color swatches
