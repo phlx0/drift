@@ -147,12 +147,9 @@ drift ships **14 scenes** and **10 built-in themes**. They cycle automatically o
 
 ## Themes
 
-Nine built-in themes matched to popular terminal colorschemes, plus `ansi`.
+Ten built-in themes matched to popular terminal colorschemes.
 
 `cosmic` · `nord` · `dracula` · `catppuccin` · `gruvbox` · `forest` · `wildberries` · `mono` · `rosepine` · `ansi`
-
-`ansi` is the odd one out: instead of fixed colors it draws with your terminal's own 0–15 palette, snapping every color a scene produces — gradients and trails included — to the nearest of the sixteen. drift then matches whatever colorscheme your terminal is set to, and it is the theme to use on terminals without true-color support.
-
 
 ```bash
 drift list themes    # preview all themes with color swatches
