@@ -273,8 +273,7 @@ func parseHex(s string) (scene.RGBColor, error) {
 	return scene.RGBColor{R: uint8(n >> 16), G: uint8((n >> 8) & 0xFF), B: uint8(n & 0xFF)}, nil
 }
 
-// Load reads the config file and merges it with compiled-in defaults.
-// Missing keys retain their default values. Returns defaults if no file exists.
+// Load merges the config file over the compiled-in defaults. A missing file yields the defaults.
 func Load() (*Config, error) {
 	cfg := Default()
 
@@ -305,7 +304,6 @@ func Load() (*Config, error) {
 func (c *Config) Validate() error {
 	var errs []string
 
-	// engine
 	if c.Engine.FPS < 1 || c.Engine.FPS > 120 {
 		errs = append(errs, fmt.Sprintf("engine.fps must be between 1 and 120, got %d", c.Engine.FPS))
 	}
@@ -316,7 +314,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("engine.fade_seconds must be >= 0, got %.2f", c.Engine.FadeSeconds))
 	}
 
-	// constellation
 	if n := c.Scene.Constellation.StarCount; n < 1 {
 		errs = append(errs, fmt.Sprintf("scene.constellation.star_count must be >= 1, got %d", n))
 	}
@@ -327,7 +324,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.constellation.max_connections must be >= 1, got %d", n))
 	}
 
-	// rain
 	if d := c.Scene.Rain.Density; d < 0 || d > 1 {
 		errs = append(errs, fmt.Sprintf("scene.rain.density must be between 0.0 and 1.0, got %.2f", d))
 	}
@@ -335,7 +331,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.rain.speed must be > 0, got %.2f", s))
 	}
 
-	// particles
 	if n := c.Scene.Particles.Count; n < 1 {
 		errs = append(errs, fmt.Sprintf("scene.particles.count must be >= 1, got %d", n))
 	}
@@ -343,7 +338,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.particles.friction must be between 0.0 and 1.0, got %.2f", f))
 	}
 
-	// waveform
 	if l := c.Scene.Waveform.Layers; l < 1 || l > 3 {
 		errs = append(errs, fmt.Sprintf("scene.waveform.layers must be between 1 and 3, got %d", l))
 	}
@@ -354,7 +348,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.waveform.speed must be > 0, got %.2f", s))
 	}
 
-	// orrery
 	if n := c.Scene.Orrery.Bodies; n < 4 || n > 8 {
 		errs = append(errs, fmt.Sprintf("scene.orrery.bodies must be between 4 and 8, got %d", n))
 	}
@@ -362,7 +355,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.orrery.trail_decay must be > 0, got %.2f", d))
 	}
 
-	// pipes
 	if n := c.Scene.Pipes.Heads; n < 1 {
 		errs = append(errs, fmt.Sprintf("scene.pipes.heads must be >= 1, got %d", n))
 	}
@@ -376,7 +368,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.pipes.reset_seconds must be > 0, got %.2f", rs))
 	}
 
-	// maze
 	if ps := c.Scene.Maze.PauseSeconds; ps < 0 {
 		errs = append(errs, fmt.Sprintf("scene.maze.pause_seconds must be >= 0, got %.2f", ps))
 	}
@@ -387,7 +378,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.maze.speed must be > 0, got %.2f", s))
 	}
 
-	// life
 	if d := c.Scene.Life.Density; d < 0 || d > 1 {
 		errs = append(errs, fmt.Sprintf("scene.life.density must be between 0.0 and 1.0, got %.2f", d))
 	}
@@ -398,7 +388,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.life.reset_seconds must be > 0, got %.2f", rs))
 	}
 
-	// starfield
 	if n := c.Scene.Starfield.Count; n < 1 {
 		errs = append(errs, fmt.Sprintf("scene.starfield.count must be >= 1, got %d", n))
 	}
@@ -406,12 +395,10 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.starfield.speed must be > 0, got %.2f", s))
 	}
 
-	// dvd
 	if s := c.Scene.DVD.Speed; s <= 0 {
 		errs = append(errs, fmt.Sprintf("scene.dvd.speed must be > 0, got %.2f", s))
 	}
 
-	// boids
 	if n := c.Scene.Boids.Count; n < 1 {
 		errs = append(errs, fmt.Sprintf("scene.boids.count must be >= 1, got %d", n))
 	}
@@ -419,7 +406,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.boids.speed must be > 0, got %.2f", s))
 	}
 
-	// plasma
 	if s := c.Scene.Plasma.Speed; s <= 0 {
 		errs = append(errs, fmt.Sprintf("scene.plasma.speed must be > 0, got %.2f", s))
 	}
@@ -427,7 +413,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.plasma.scale must be > 0, got %.2f", s))
 	}
 
-	// bonsai
 	if ps := c.Scene.Bonsai.PauseSeconds; ps < 0 {
 		errs = append(errs, fmt.Sprintf("scene.bonsai.pause_seconds must be >= 0, got %.2f", ps))
 	}
@@ -438,7 +423,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Sprintf("scene.bonsai.speed must be > 0, got %.2f", s))
 	}
 
-	// custom themes
 	for name, ct := range c.Theme {
 		if len(ct.Palette) == 0 {
 			errs = append(errs, fmt.Sprintf("theme.%s.palette must have at least 1 color", name))
