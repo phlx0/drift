@@ -7,6 +7,18 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.3.0] — 2026-09-10
+
+### Added
+
+- `exit_on_mouse` option in `[engine]` and matching `--exit-on-mouse` flag — restores the previous click-to-quit behavior for anyone who wants it
+
+### Changed
+
+- **mouse clicks no longer quit drift** — any click used to exit immediately, so on window managers that deliver the focus click to the application it was impossible to switch to drift's terminal without dismissing it; mouse reporting is now off unless `exit_on_mouse = true` is set in `[engine]` or `--exit-on-mouse` is passed, which also leaves the terminal's own text selection and scrollback usable while drift runs ([#59](https://github.com/phlx0/drift/issues/59))
+
+---
+
 ## [1.2.0] — 2026-09-04
 
 ### Added
@@ -279,6 +291,7 @@ Activate with `eval "$(drift shell-init zsh)"` (or bash/fish).
 - Pre-built releases for macOS and Linux (amd64 + arm64)
 - goreleaser pipeline with SHA-256 checksums
 
+[1.3.0]: https://github.com/phlx0/drift/releases/tag/v1.3.0
 [1.2.0]: https://github.com/phlx0/drift/releases/tag/v1.2.0
 [1.1.0]: https://github.com/phlx0/drift/releases/tag/v1.1.0
 [1.0.0]: https://github.com/phlx0/drift/releases/tag/v1.0.0

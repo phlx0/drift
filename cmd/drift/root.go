@@ -32,11 +32,12 @@ func Execute() error {
 }
 
 var (
-	flagTheme    string
-	flagScene    string
-	flagFPS      int
-	flagDuration float64
-	flagShowcase bool
+	flagTheme       string
+	flagScene       string
+	flagFPS         int
+	flagDuration    float64
+	flagShowcase    bool
+	flagExitOnMouse bool
 )
 
 var rootCmd = &cobra.Command{
@@ -70,6 +71,7 @@ func init() {
 	f.IntVar(&flagFPS, "fps", 0, "target frame rate in Hz (overrides config)")
 	f.Float64Var(&flagDuration, "duration", 0, "seconds per scene when cycling, 0 = no cycling (overrides config)")
 	f.BoolVar(&flagShowcase, "showcase", false, "run continuously; ↑↓/ws=scene  ←→/ad=theme  esc=quit")
+	f.BoolVar(&flagExitOnMouse, "exit-on-mouse", false, "quit on mouse click (disables terminal text selection)")
 
 	rootCmd.AddCommand(shellInitCmd)
 	rootCmd.AddCommand(listCmd)
@@ -100,6 +102,9 @@ func runEngine(cmd *cobra.Command, _ []string) error {
 	}
 	if flagShowcase {
 		cfg.Engine.Showcase = true
+	}
+	if flagExitOnMouse {
+		cfg.Engine.ExitOnMouse = true
 	}
 
 	e := engine.New(*cfg)
@@ -228,6 +233,7 @@ func showConfig() error {
 	fmt.Printf("scenes:           %s\n", cfg.Engine.Scenes)
 	fmt.Printf("shuffle:          %v\n", cfg.Engine.Shuffle)
 	fmt.Printf("hide_tmux_status: %v\n", cfg.Engine.HideTmuxStatus)
+	fmt.Printf("exit_on_mouse:    %v\n", cfg.Engine.ExitOnMouse)
 	return nil
 }
 

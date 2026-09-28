@@ -308,6 +308,7 @@ theme            = "cosmic"
 shuffle          = true
 hide_tmux_status = false
 oled_shift       = false  # 1-cell shift every 10s; only useful on bare OLED hardware
+exit_on_mouse    = false  # quit on mouse click; also captures the mouse, disabling terminal text selection
 
 [scene.constellation]
 star_count      = 80

@@ -78,14 +78,12 @@ type Engine struct {
 	shiftOX    int     // current x offset for OLED pixel shift
 	shiftOY    int     // current y offset for OLED pixel shift
 
-	// showcase mode
 	themeNames []string // sorted theme names
 	themeIdx   int      // index into themeNames
 	hudTimer   float64  // seconds remaining to show the HUD overlay
 
 	allThemes map[string]scene.Theme // built-in + custom, resolved once at startup
 
-	// transition
 	transition     transitionPhase
 	transitionT    float64 // elapsed time in current phase
 	transitionNext int     // scene index to switch to at fade-out completion
@@ -118,7 +116,12 @@ func (e *Engine) Run() error {
 	screen.SetStyle(tcell.StyleDefault)
 	screen.Clear()
 	screen.HideCursor()
-	screen.EnableMouse(tcell.MouseButtonEvents)
+	// Mouse reporting is only enabled when clicks should quit drift. Left off,
+	// the terminal never forwards clicks, so click-to-focus and text selection
+	// keep working while drift runs.
+	if e.cfg.Engine.ExitOnMouse {
+		screen.EnableMouse(tcell.MouseButtonEvents)
+	}
 
 	e.screen = screen
 	e.allThemes = e.cfg.AllThemes()
@@ -205,7 +208,7 @@ func (e *Engine) Run() error {
 	}
 }
 
-// handleEvent processes a single terminal event. Returns true if drift should exit.
+// handleEvent returns true if drift should exit.
 func (e *Engine) handleEvent(ev tcell.Event, screen tcell.Screen, w, h *int) bool {
 	if e.cfg.Engine.Showcase {
 		return e.handleShowcaseEvent(ev, screen, w, h)
@@ -221,8 +224,6 @@ func (e *Engine) handleEvent(ev tcell.Event, screen tcell.Screen, w, h *int) boo
 	return false
 }
 
-// handleShowcaseEvent handles input in showcase mode.
-// Navigation keys cycle scenes/themes; Escape exits.
 func (e *Engine) handleShowcaseEvent(ev tcell.Event, screen tcell.Screen, w, h *int) bool {
 	switch ev := ev.(type) {
 	case *tcell.EventKey:
@@ -302,8 +303,6 @@ func (e *Engine) prevTheme(w, h int) {
 	e.scenes[e.cur].Init(w, h, e.theme)
 }
 
-// drawHUD renders the showcase overlay at the bottom two rows of the screen.
-// Drawn after the scene, so it appears on top. Visible while hudTimer > 0.
 func (e *Engine) drawHUD(screen tcell.Screen, w, h int) {
 	if h < 2 {
 		return
@@ -321,7 +320,6 @@ func (e *Engine) drawHUD(screen tcell.Screen, w, h int) {
 		Foreground(tcell.NewRGBColor(100, 100, 120)).
 		Background(bgDark)
 
-	// fill rows with background color first
 	for x := range w {
 		screen.SetContent(x, h-2, ' ', nil, hintStyle)
 		screen.SetContent(x, h-1, ' ', nil, statusStyle)
@@ -340,14 +338,12 @@ func (e *Engine) drawHUD(screen tcell.Screen, w, h int) {
 	}
 }
 
-// handleTick advances the simulation by dt seconds and redraws the screen.
 func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 	// Cap dt to prevent large jumps after sleep/wake.
 	if dt > 0.1 {
 		dt = 0.1
 	}
 
-	// Advance OLED pixel shift when enabled.
 	if e.cfg.Engine.OLEDShift {
 		e.shiftTimer += dt
 		if e.shiftTimer >= 10.0 {
@@ -361,7 +357,6 @@ func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 		e.shiftOX, e.shiftOY = 0, 0
 	}
 
-	// Advance transition state machine.
 	if e.transition != transitionNone {
 		e.transitionT += dt
 		dur := e.cfg.Engine.FadeSeconds
@@ -411,8 +406,7 @@ func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 	}
 }
 
-// fadeAlpha returns the current fade overlay opacity (0 = fully visible,
-// 1 = fully black) based on transition phase and progress.
+// fadeAlpha returns the fade overlay opacity, 0 = visible, 1 = black.
 func (e *Engine) fadeAlpha() float64 {
 	dur := e.cfg.Engine.FadeSeconds
 	if dur <= 0 {

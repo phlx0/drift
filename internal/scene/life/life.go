@@ -157,13 +157,10 @@ func (l *Life) Draw(screen tcell.Screen) {
 			var style tcell.Style
 			switch {
 			case age <= 1:
-				// newborn — flash bright
 				style = l.theme.Bright.Style()
 			case age <= 6:
-				// young — full palette color
 				style = pal[(x+y)%len(pal)].Style()
 			default:
-				// old — dim variant for depth
 				style = dim[(x+y)%len(dim)].Style()
 			}
 			screen.SetContent(x, y, '█', nil, style)
