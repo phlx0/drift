@@ -178,9 +178,6 @@ var listCmd = &cobra.Command{
 	},
 }
 
-// colorSwatch renders a two-cell block in c. Themes flagged ansi are drawn
-// with the matching palette index instead, so the preview shows the colors the
-// terminal will actually use.
 func colorSwatch(c scene.RGBColor, ansi bool) string {
 	if ansi {
 		return fmt.Sprintf("\x1b[%dm██\x1b[0m", ansiSGR(scene.ANSIIndex(c)))
@@ -188,7 +185,6 @@ func colorSwatch(c scene.RGBColor, ansi bool) string {
 	return fmt.Sprintf("\x1b[38;2;%d;%d;%dm██\x1b[0m", c.R, c.G, c.B)
 }
 
-// ansiSGR maps an ANSI palette index (0-15) to its foreground SGR parameter.
 func ansiSGR(idx int) int {
 	if idx < 8 {
 		return 30 + idx

@@ -30,9 +30,6 @@ func TestANSIIndexNearest(t *testing.T) {
 	}
 }
 
-// The ansi theme's own colors must survive snapping untouched, otherwise a
-// scene drawing straight from the palette would land on a different terminal
-// color than the one the theme names.
 func TestANSIThemeColorsRoundTrip(t *testing.T) {
 	th, ok := Themes["ansi"]
 	if !ok {

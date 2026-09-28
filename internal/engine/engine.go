@@ -58,10 +58,6 @@ func (f *fadeScreen) SetContent(x, y int, main rune, comb []rune, style tcell.St
 	f.Screen.SetContent(x, y, main, comb, style)
 }
 
-// ansiScreen wraps tcell.Screen and snaps every foreground color to the
-// nearest of the terminal's 16 ANSI palette entries, so a scene picks up the
-// user's own colorscheme instead of fixed RGB values. Backgrounds pass
-// through untouched. Used by themes with Theme.ANSI set.
 type ansiScreen struct {
 	tcell.Screen
 }
@@ -404,8 +400,7 @@ func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 	shifted := &shiftScreen{Screen: screen, ox: e.shiftOX, oy: e.shiftOY}
 	screen.Fill(' ', tcell.StyleDefault)
 	var drawTarget tcell.Screen = shifted
-	// ANSI snapping sits inside the fade so the fade still interpolates in
-	// RGB and only the final color is quantised to a palette index.
+	// Snap inside the fade so fading interpolates in RGB before quantising.
 	if e.theme.ANSI {
 		drawTarget = &ansiScreen{Screen: drawTarget}
 	}
