@@ -118,7 +118,6 @@ func (c *Constellation) Update(dt float64) {
 		s.y += s.vy * dt
 		s.twinkle += s.twinkleFreq * dt
 
-		// Elastic bounce at edges.
 		if s.x < 0 {
 			s.x = -s.x
 			s.vx = -s.vx
@@ -184,7 +183,6 @@ func (c *Constellation) Draw(screen tcell.Screen) {
 		pal := c.theme.Palette[s.paletteIdx]
 		color := scene.Lerp(dim, pal, brightness)
 		if brightness > 0.9 {
-			// Flash toward Bright at peak twinkle.
 			color = scene.Lerp(pal, c.theme.Bright, (brightness-0.9)*10)
 		}
 		x, y := int(s.x+0.5), int(s.y+0.5)
