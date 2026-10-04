@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -80,6 +81,58 @@ func (a *ansiScreen) SetContent(x, y int, main rune, comb []rune, style tcell.St
 	a.Screen.SetContent(x, y, main, comb, style)
 }
 
+// frameScreen collects a frame's cells and passes tcell only the ones that
+// changed since the last frame. tcell compares a new cell with the cell's
+// current content, not with what the terminal shows, so after a Fill every
+// visible cell drawn again reads as changed and is sent again, every frame.
+type frameScreen struct {
+	tcell.Screen
+	w, h  int
+	next  []frameCell // the frame being drawn
+	shown []frameCell // the frame last passed to tcell
+	blank []frameCell // an empty frame, copied into next to start one
+}
+
+type frameCell struct {
+	main  rune
+	comb  []rune
+	style tcell.Style
+}
+
+// begin starts a frame: every cell blank, as screen.Fill(' ') left it.
+func (f *frameScreen) begin() {
+	w, h := f.Size()
+	if w != f.w || h != f.h {
+		f.w, f.h = w, h
+		f.next = make([]frameCell, w*h)
+		f.shown = make([]frameCell, w*h)
+		f.blank = make([]frameCell, w*h)
+		for i := range f.shown {
+			f.shown[i].main = -1 // matches no cell, so the first frame is sent whole
+			f.blank[i] = frameCell{main: ' ', style: tcell.StyleDefault}
+		}
+	}
+	copy(f.next, f.blank)
+}
+
+func (f *frameScreen) SetContent(x, y int, main rune, comb []rune, style tcell.Style) {
+	if x >= 0 && x < f.w && y >= 0 && y < f.h {
+		f.next[y*f.w+x] = frameCell{main, comb, style}
+	}
+}
+
+// flush passes the cells that changed to tcell.
+func (f *frameScreen) flush() {
+	for i, c := range f.next {
+		s := &f.shown[i]
+		if c.main == s.main && c.style == s.style && slices.Equal(c.comb, s.comb) {
+			continue
+		}
+		f.Screen.SetContent(i%f.w, i/f.w, c.main, c.comb, c.style)
+		*s = c
+	}
+}
+
 type transitionPhase int
 
 const (
@@ -92,6 +145,7 @@ type Engine struct {
 	cfg config.Config
 
 	screen     tcell.Screen
+	frame      frameScreen
 	scenes     []scene.Scene
 	cur        int // index into scenes
 	theme      scene.Theme
@@ -403,8 +457,9 @@ func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 	cur := e.scenes[e.cur]
 	cur.Update(dt)
 
-	shifted := &shiftScreen{Screen: screen, ox: e.shiftOX, oy: e.shiftOY}
-	screen.Fill(' ', tcell.StyleDefault)
+	e.frame.Screen = screen
+	e.frame.begin()
+	shifted := &shiftScreen{Screen: &e.frame, ox: e.shiftOX, oy: e.shiftOY}
 	var drawTarget tcell.Screen = shifted
 	// Snap inside the fade so fading interpolates in RGB before quantising.
 	if e.theme.ANSI {
@@ -418,10 +473,11 @@ func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 	if e.cfg.Engine.Showcase {
 		if e.hudTimer > 0 {
 			e.hudTimer -= dt
-			e.drawHUD(screen, *w, *h)
+			e.drawHUD(&e.frame, *w, *h)
 		}
 	}
 
+	e.frame.flush()
 	screen.Show()
 
 	if !e.cfg.Engine.Showcase && e.cfg.Engine.CycleSeconds > 0 && len(e.scenes) > 1 {

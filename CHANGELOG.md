@@ -13,6 +13,10 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - **ansi** theme — uses your terminal's own 16 colors, so it follows your colorscheme
 
+### Changed
+
+- **only changed cells are sent to the terminal** — each frame cleared the screen with `Fill` and drew the scene again, and tcell compares a cell with its current content rather than with what the terminal shows, so every visible cell was sent again every frame; the engine now passes tcell only the cells that changed since the last frame. In 5 seconds at 100×30: maze 10.9 MB → 45 KB, bonsai 598 KB → 9 KB, pipes 674 KB → 31 KB, clock 77 KB → 4.5 KB
+
 ---
 
 ## [1.3.0] — 2026-09-10
