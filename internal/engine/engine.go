@@ -65,11 +65,17 @@ type ansiScreen struct {
 func (a *ansiScreen) SetContent(x, y int, main rune, comb []rune, style tcell.Style) {
 	fg, _, _ := style.Decompose()
 	if hex := fg.Hex(); hex >= 0 {
-		style = style.Foreground(scene.ANSIColor(scene.RGBColor{
+		idx := scene.ANSIIndex(scene.RGBColor{
 			R: uint8(hex >> 16),
 			G: uint8(hex >> 8),
 			B: uint8(hex),
-		}))
+		})
+		// Color 0 is usually visible, not the background, so near-black
+		// cells (fade tails) are dropped instead of drawn in it.
+		if idx == 0 {
+			return
+		}
+		style = style.Foreground(tcell.PaletteColor(idx))
 	}
 	a.Screen.SetContent(x, y, main, comb, style)
 }

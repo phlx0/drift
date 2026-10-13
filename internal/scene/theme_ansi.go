@@ -1,9 +1,5 @@
 package scene
 
-import (
-	"github.com/gdamore/tcell/v2"
-)
-
 // ansiRGB holds conventional values for the 16 ANSI colors. They're never
 // rendered directly (the terminal substitutes its own palette for the index),
 // so they only need to be representative reference points for snapping.
@@ -40,10 +36,6 @@ func ANSIIndex(c RGBColor) int {
 		}
 	}
 	return best
-}
-
-func ANSIColor(c RGBColor) tcell.Color {
-	return tcell.PaletteColor(ANSIIndex(c))
 }
 
 func ansiTheme() Theme {

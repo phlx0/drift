@@ -147,7 +147,7 @@ drift ships **14 scenes** and **10 built-in themes**. They cycle automatically o
 
 ## Themes
 
-Ten built-in themes matched to popular terminal colorschemes.
+Ten built-in themes matched to popular terminal colorschemes. `ansi` uses your terminal's own 16 colors, so it follows your colorscheme.
 
 `cosmic` · `nord` · `dracula` · `catppuccin` · `gruvbox` · `forest` · `wildberries` · `mono` · `rosepine` · `ansi`
 

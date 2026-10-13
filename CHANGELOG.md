@@ -11,7 +11,7 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- ansi theme - ansi uses your terminal's own 16 colors, so it follows your colorscheme
+- **ansi** theme — uses your terminal's own 16 colors, so it follows your colorscheme
 
 ---
 
