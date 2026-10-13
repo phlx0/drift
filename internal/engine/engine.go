@@ -58,6 +58,28 @@ func (f *fadeScreen) SetContent(x, y int, main rune, comb []rune, style tcell.St
 	f.Screen.SetContent(x, y, main, comb, style)
 }
 
+type ansiScreen struct {
+	tcell.Screen
+}
+
+func (a *ansiScreen) SetContent(x, y int, main rune, comb []rune, style tcell.Style) {
+	fg, _, _ := style.Decompose()
+	if hex := fg.Hex(); hex >= 0 {
+		idx := scene.ANSIIndex(scene.RGBColor{
+			R: uint8(hex >> 16),
+			G: uint8(hex >> 8),
+			B: uint8(hex),
+		})
+		// Color 0 is usually visible, not the background, so near-black
+		// cells (fade tails) are dropped instead of drawn in it.
+		if idx == 0 {
+			return
+		}
+		style = style.Foreground(tcell.PaletteColor(idx))
+	}
+	a.Screen.SetContent(x, y, main, comb, style)
+}
+
 type transitionPhase int
 
 const (
@@ -384,8 +406,12 @@ func (e *Engine) handleTick(dt float64, screen tcell.Screen, w, h *int) {
 	shifted := &shiftScreen{Screen: screen, ox: e.shiftOX, oy: e.shiftOY}
 	screen.Fill(' ', tcell.StyleDefault)
 	var drawTarget tcell.Screen = shifted
+	// Snap inside the fade so fading interpolates in RGB before quantising.
+	if e.theme.ANSI {
+		drawTarget = &ansiScreen{Screen: drawTarget}
+	}
 	if alpha := e.fadeAlpha(); alpha > 0 {
-		drawTarget = &fadeScreen{Screen: shifted, alpha: alpha}
+		drawTarget = &fadeScreen{Screen: drawTarget, alpha: alpha}
 	}
 	cur.Draw(drawTarget)
 
