@@ -32,12 +32,14 @@ func Execute() error {
 }
 
 var (
-	flagTheme       string
-	flagScene       string
-	flagFPS         int
-	flagDuration    float64
-	flagShowcase    bool
-	flagExitOnMouse bool
+	flagTheme          string
+	flagScene          string
+	flagFPS            int
+	flagDuration       float64
+	flagShowcase       bool
+	flagExitOnMouse    bool
+	flagPauseUnfocused bool
+	flagExclusive      bool
 )
 
 var rootCmd = &cobra.Command{
@@ -72,6 +74,8 @@ func init() {
 	f.Float64Var(&flagDuration, "duration", 0, "seconds per scene when cycling, 0 = no cycling (overrides config)")
 	f.BoolVar(&flagShowcase, "showcase", false, "run continuously; ↑↓/ws=scene  ←→/ad=theme  esc=quit")
 	f.BoolVar(&flagExitOnMouse, "exit-on-mouse", false, "quit on mouse click (disables terminal text selection)")
+	f.BoolVar(&flagPauseUnfocused, "pause-unfocused", true, "stop rendering while the terminal is unfocused (overrides config)")
+	f.BoolVar(&flagExclusive, "exclusive", true, "only the most recently started or focused instance renders (overrides config)")
 
 	rootCmd.AddCommand(shellInitCmd)
 	rootCmd.AddCommand(listCmd)
@@ -105,6 +109,12 @@ func runEngine(cmd *cobra.Command, _ []string) error {
 	}
 	if flagExitOnMouse {
 		cfg.Engine.ExitOnMouse = true
+	}
+	if cmd.Flags().Changed("pause-unfocused") {
+		cfg.Engine.PauseUnfocused = flagPauseUnfocused
+	}
+	if cmd.Flags().Changed("exclusive") {
+		cfg.Engine.Exclusive = flagExclusive
 	}
 
 	e := engine.New(*cfg)
@@ -244,6 +254,9 @@ func showConfig() error {
 	fmt.Printf("shuffle:          %v\n", cfg.Engine.Shuffle)
 	fmt.Printf("hide_tmux_status: %v\n", cfg.Engine.HideTmuxStatus)
 	fmt.Printf("exit_on_mouse:    %v\n", cfg.Engine.ExitOnMouse)
+	fmt.Printf("pause_unfocused:  %v\n", cfg.Engine.PauseUnfocused)
+	fmt.Printf("exclusive:        %v\n", cfg.Engine.Exclusive)
+	fmt.Printf("nice:             %d\n", cfg.Engine.Nice)
 	return nil
 }
 

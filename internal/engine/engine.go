@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"os/signal"
 	"slices"
 	"sort"
 	"strings"
@@ -163,6 +164,14 @@ type Engine struct {
 	transition     transitionPhase
 	transitionT    float64 // elapsed time in current phase
 	transitionNext int     // scene index to switch to at fade-out completion
+
+	// Frame clock. tick is nil while paused (terminal unfocused, or another
+	// instance took over rendering), so the loop never wakes for frames.
+	interval time.Duration
+	ticker   *time.Ticker
+	tick     <-chan time.Time
+	lastTick time.Time
+	paused   bool
 }
 
 func New(cfg config.Config) *Engine {
@@ -198,6 +207,10 @@ func (e *Engine) Run() error {
 	if e.cfg.Engine.ExitOnMouse {
 		screen.EnableMouse(tcell.MouseButtonEvents)
 	}
+	if e.cfg.Engine.PauseUnfocused {
+		screen.EnableFocus()
+	}
+	setNice(e.cfg.Engine.Nice)
 
 	e.screen = screen
 	e.allThemes = e.cfg.AllThemes()
@@ -265,23 +278,77 @@ func (e *Engine) Run() error {
 	if fps <= 0 {
 		fps = 30
 	}
-	ticker := time.NewTicker(time.Duration(int64(time.Second) / int64(fps)))
-	defer ticker.Stop()
+	e.interval = time.Duration(int64(time.Second) / int64(fps))
+	e.resume()
+	defer e.pause()
 
-	lastTick := time.Now()
+	// Another instance taking over rendering asks us to pause with a signal.
+	var takeover <-chan os.Signal
+	if e.cfg.Engine.Exclusive && pauseSignal != nil {
+		sigs := make(chan os.Signal, 1)
+		signal.Notify(sigs, pauseSignal)
+		defer signal.Stop(sigs)
+		takeover = sigs
+		claimRender()
+		defer releaseRender()
+	}
 
 	for {
 		select {
 		case ev := <-events:
+			if fe, ok := ev.(*tcell.EventFocus); ok {
+				e.handleFocus(fe.Focused, screen)
+				continue
+			}
 			if done := e.handleEvent(ev, screen, &w, &h); done {
 				return nil
 			}
-		case now := <-ticker.C:
-			dt := now.Sub(lastTick).Seconds()
-			lastTick = now
+		case <-takeover:
+			e.pause()
+		case now := <-e.tick:
+			dt := now.Sub(e.lastTick).Seconds()
+			e.lastTick = now
 			e.handleTick(dt, screen, &w, &h)
 		}
 	}
+}
+
+// handleFocus pauses on focus-out and resumes on focus-in. A focus-in also
+// takes over rendering from other instances when Exclusive is on.
+func (e *Engine) handleFocus(focused bool, screen tcell.Screen) {
+	if !focused {
+		if e.cfg.Engine.PauseUnfocused {
+			e.pause()
+		}
+		return
+	}
+	if e.cfg.Engine.Exclusive {
+		claimRender()
+	}
+	if e.paused {
+		e.resume()
+		screen.Sync() // the terminal may have been redrawn while drift was silent
+	}
+}
+
+// pause stops the frame clock: no ticks, no simulation, no terminal output.
+func (e *Engine) pause() {
+	if e.ticker != nil {
+		e.ticker.Stop()
+		e.ticker = nil
+	}
+	e.tick = nil
+	e.paused = true
+}
+
+// resume starts the frame clock, or restarts it after pause.
+func (e *Engine) resume() {
+	if e.ticker == nil {
+		e.ticker = time.NewTicker(e.interval)
+	}
+	e.tick = e.ticker.C
+	e.lastTick = time.Now()
+	e.paused = false
 }
 
 // handleEvent returns true if drift should exit.
