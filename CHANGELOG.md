@@ -11,6 +11,9 @@ drift uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `pause_unfocused` option in `[engine]` and matching `--pause-unfocused` flag (default on) — drift stops its frame clock while the terminal reports that it has lost focus (hidden tab, other window), so nothing is simulated or written until focus returns; terminals without focus reporting behave as before
+- `exclusive` option in `[engine]` and matching `--exclusive` flag (default on, Unix) — only one drift instance per user renders at a time: the one that most recently started or regained focus. Terminals never report their initial focus state, so a screensaver that starts in an already hidden tab used to render frames nobody saw; with several idle shells in an IDE this was three cores of pure escape codes
+- `nice` option in `[engine]` (default 10, Unix) — lowers drift's scheduling priority so it yields to real work
 - **ansi** theme — uses your terminal's own 16 colors, so it follows your colorscheme
 
 ### Changed

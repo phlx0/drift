@@ -58,6 +58,19 @@ type EngineConfig struct {
 	// Off by default: enabling it also turns on mouse reporting, which takes
 	// over click-to-focus and the terminal's own text selection.
 	ExitOnMouse bool `toml:"exit_on_mouse"`
+	// PauseUnfocused stops rendering entirely while the terminal reports that it
+	// has lost focus (hidden tab, other window). Needs a terminal with focus
+	// reporting (xterm, kitty, Konsole, VS Code/xterm.js, tmux >= 3.2);
+	// terminals without it simply never pause.
+	PauseUnfocused bool `toml:"pause_unfocused"`
+	// Exclusive lets only one drift instance per user render at a time: the one
+	// that most recently started or regained focus. The others pause until their
+	// terminal reports focus. Terminals do not report their initial focus state,
+	// so this covers a screensaver starting in an already hidden tab. Unix only.
+	Exclusive bool `toml:"exclusive"`
+	// Nice lowers the process scheduling priority so drift yields to real work
+	// (0 = unchanged, 19 = lowest). Unix only.
+	Nice int `toml:"nice"`
 }
 
 type SceneConfig struct {
@@ -159,12 +172,15 @@ type LifeConfig struct {
 func Default() *Config {
 	return &Config{
 		Engine: EngineConfig{
-			FPS:          30,
-			CycleSeconds: 60,
-			FadeSeconds:  0.3,
-			Scenes:       "all",
-			Theme:        "cosmic",
-			Shuffle:      true,
+			FPS:            30,
+			CycleSeconds:   60,
+			FadeSeconds:    0.3,
+			Scenes:         "all",
+			Theme:          "cosmic",
+			Shuffle:        true,
+			PauseUnfocused: true,
+			Exclusive:      true,
+			Nice:           10,
 		},
 		Scene: SceneConfig{
 			Constellation: ConstellationConfig{
@@ -312,6 +328,9 @@ func (c *Config) Validate() error {
 	}
 	if c.Engine.FadeSeconds < 0 {
 		errs = append(errs, fmt.Sprintf("engine.fade_seconds must be >= 0, got %.2f", c.Engine.FadeSeconds))
+	}
+	if c.Engine.Nice < 0 || c.Engine.Nice > 19 {
+		errs = append(errs, fmt.Sprintf("engine.nice must be between 0 and 19, got %d", c.Engine.Nice))
 	}
 
 	if n := c.Scene.Constellation.StarCount; n < 1 {
@@ -519,6 +538,9 @@ shuffle       = true   # randomise scene order
 hide_tmux_status = false  # tmux: hide status bar while displaying scene
 oled_shift       = false  # shift scene content by 1 cell every 10s to reduce OLED burn-in; only useful on bare OLED hardware
 exit_on_mouse    = false  # quit on mouse click; also captures the mouse, disabling terminal text selection
+pause_unfocused  = true   # stop rendering while the terminal is unfocused or hidden (needs focus reporting)
+exclusive        = true   # only the most recently started or focused drift instance renders, the others pause
+nice             = 10     # lower CPU priority so drift yields to real work (0 = unchanged, 19 = lowest)
 
 [scene.constellation]
 star_count      = 80

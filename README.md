@@ -308,6 +308,9 @@ shuffle          = true
 hide_tmux_status = false
 oled_shift       = false  # 1-cell shift every 10s; only useful on bare OLED hardware
 exit_on_mouse    = false  # quit on mouse click; also captures the mouse, disabling terminal text selection
+pause_unfocused  = true   # stop rendering while the terminal is unfocused or hidden (needs focus reporting)
+exclusive        = true   # only the most recently started or focused instance renders, the others pause (Unix)
+nice             = 10     # lower CPU priority so drift yields to real work (0 = unchanged, 19 = lowest)
 
 [scene.constellation]
 star_count      = 80
